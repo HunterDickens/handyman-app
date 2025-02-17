@@ -1,2 +1,2 @@
-# handyman-app
-handyman-app
+# Handyman
+Software Dev II projecty 
