@@ -6,6 +6,8 @@ const morgan = require("morgan");
 const authRoutes = require("./routes/authRoutes");
 const uploadRoutes = require("./routes/uploadRoutes"); // ✅ Import Upload Routes
 const projectRoutes = require("./routes/projectRoutes"); 
+const diagnoseRoutes = require("./routes/diagnoseRoutes");
+
 const app = express();
 
 // Middleware
@@ -17,6 +19,8 @@ app.use(morgan("dev"));
 app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes); // ✅ Ensure Upload Routes are registered
 app.use("/api/projects", projectRoutes); 
+app.use("/api/diagnose", diagnoseRoutes);
+
 // Test Route
 app.get("/", (req, res) => {
   res.send("Handyman API is running...");
