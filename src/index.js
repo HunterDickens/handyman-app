@@ -3,11 +3,11 @@ const cors = require("cors");
 const morgan = require("morgan");
 require("dotenv").config(); // Ensure .env is loaded
 
-const { db, auth, bucket } = require("./firebaseAdmin"); // ✅ Correct for backend
-const authRoutes = require("./authRoutes"); // Ensure correct path
-const uploadRoutes = require("./uploadRoutes"); // ✅ Load after initializing `app`
+const { db, auth, bucket } = require("./firebaseAdmin"); // ✅ Import Firebase Admin SDK
+const authRoutes = require("./authRoutes"); // ✅ Import Auth Routes
+const uploadRoutes = require("./uploadRoutes"); // ✅ Import Upload Routes
 
-const app = express(); // ✅ Initialize `app` first
+const app = express(); // ✅ Initialize Express
 
 // Middleware
 app.use(express.json());
@@ -15,9 +15,9 @@ app.use(express.urlencoded({ extended: true })); // Allow form submissions
 app.use(cors());
 app.use(morgan("dev"));
 
-// ✅ Ensure routes are correctly loaded AFTER initializing `app`
+// ✅ Register Routes
 app.use("/auth", authRoutes);
-app.use("/api", uploadRoutes); // ✅ Move this after initializing `app`
+app.use("/api", uploadRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
