@@ -1,29 +1,15 @@
 # Node.js dependencies
 node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+package-lock.json
 
-# Firebase secrets and environment variables
-firebase-debug.log
+# Firebase secrets and environment variables (DO NOT COMMIT)
 firebase.json
 firebase-service-account.json
-src/firebase-service-account.json
-.expo/firebase-service-account.json
+backend/firebase/firebase-service-account.json
 .env
 .env.local
 .env.development
 .env.production
-
-# Build files
-dist/
-build/
-
-# Firebase Hosting and Functions
-functions/node_modules/
-functions/package-lock.json
-functions/.firebase/
-functions/dist/
 
 # Logs and debugging files
 logs/
@@ -31,6 +17,24 @@ logs/
 debug.log
 *.out
 *.pid
+firebase-debug.log
+
+# Build files (for frontend and backend)
+dist/
+build/
+public/build/
+
+# Firebase Hosting and Functions (if functions/ is still used)
+functions/node_modules/
+functions/package-lock.json
+functions/.firebase/
+functions/dist/
+
+# Ignore Firebase security rules and indexes if not tracking them
+firestore.indexes.json
+firestore.rules
+database.rules.json
+storage.rules
 
 # Operating system and editor files
 .DS_Store
@@ -41,9 +45,5 @@ Thumbs.db
 *.swo
 *.swn
 
-# Firebase storage and emulator data
-firestore.indexes.json
-firestore.rules
-database.rules.json
-storage.rules
-firebase-debug.log
+# Dataconnect-generated (assuming it's auto-generated)
+dataconnect-generated/
