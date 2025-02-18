@@ -13,15 +13,17 @@ router.post("/", verifyFirebaseToken, async (req, res) => {
     if (!title) {
       return res.status(400).json({ error: "Project title is required" });
     }
-
+    
     const newProject = {
-      title,
-      description: description || "",
-      materials: materials || [],
-      userId,
-      status: "in-progress",
-      createdAt: new Date(),
-    };
+        title,
+        description: description || "",
+        materials: materials || [],
+        userId,
+        status: "in-progress",
+        createdAt: new Date(),
+        images: [], // ✅ Store image URLs here
+      };
+      
 
     const projectRef = await db.collection("projects").add(newProject);
 
