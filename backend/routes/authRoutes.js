@@ -1,6 +1,6 @@
 const express = require("express");
 const fetch = require("node-fetch");
-const { db, auth } = require("./firebaseAdmin"); // Firebase Admin SDK
+const { db, auth } = require("../firebase/firebaseAdmin"); // ✅ Correct path
 
 const router = express.Router();
 
