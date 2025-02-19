@@ -8,8 +8,9 @@ const router = express.Router();
 
 // ✅ Initialize Google Vision Client
 const client = new vision.ImageAnnotatorClient({
-  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, // ✅ Make sure this is correctly set in .env
+  keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS, // Ensure it's correctly set in .env
 });
+
 
 // ✅ Configure Multer for Image Uploads
 const upload = multer({

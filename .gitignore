@@ -11,6 +11,7 @@ backend/firebase/firebase-service-account.json
 .env.local
 .env.development
 .env.production
+/backend/keys/
 
 # Logs and debugging files
 logs/
