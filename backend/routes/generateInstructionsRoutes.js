@@ -1,12 +1,12 @@
-// routes/generateInstructionsRoutes.js
 const express = require("express");
-const { OpenAI } = require("openai"); // Correct import for OpenAI
+const { OpenAI } = require("openai");
 require("dotenv").config();
 
 const router = express.Router();
 
+// Initialize OpenAI
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
+  apiKey: process.env.OPENAI_API_KEY, // API Key from .env
 });
 
 // Endpoint for generating repair instructions
@@ -22,8 +22,8 @@ router.post("/generate-instructions", async (req, res) => {
 
     // Make a request to OpenAI to generate the instructions
     const response = await openai.chat.completions.create({
-      model: "gpt-3.5-turbo", // You can use any available GPT model
-      messages: [{ role: "system", content: prompt }],
+      model: "gpt-4o-mini", // Change the model to gpt-4o-mini
+      messages: [{ role: "user", content: prompt }],
     });
 
     const repairInstructions = response.choices[0].message.content.trim();

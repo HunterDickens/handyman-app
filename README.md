@@ -122,6 +122,8 @@ handyman-app/
 │   │   ├── firebaseAdmin.js
 │   │   ├── firebase-service-account.json
 │   │   ├── firebase.js  # Only if backend needs Firebase
+│   ├── keys/
+│   │   ├── google-vision-service-account.json
 │   ├── routes/            # API routes
 │   ├── services/          # Business logic
 │   ├── firestore.rules     # Firestore security rules

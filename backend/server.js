@@ -4,9 +4,10 @@ const cors = require("cors");
 const morgan = require("morgan");
 
 const authRoutes = require("./routes/authRoutes");
-const uploadRoutes = require("./routes/uploadRoutes"); // ✅ Import Upload Routes
+const uploadRoutes = require("./routes/uploadRoutes"); 
 const projectRoutes = require("./routes/projectRoutes"); 
 const diagnoseRoutes = require("./routes/diagnoseRoutes");
+const generateInstructionsRoutes = require("./routes/generateInstructionsRoutes"); // Import the new route
 
 const app = express();
 
@@ -17,9 +18,10 @@ app.use(morgan("dev"));
 
 // Register API Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/upload", uploadRoutes); // ✅ Ensure Upload Routes are registered
+app.use("/api/upload", uploadRoutes); 
 app.use("/api/projects", projectRoutes); 
 app.use("/api/diagnose", diagnoseRoutes);
+app.use("/api", generateInstructionsRoutes);
 
 // Test Route
 app.get("/", (req, res) => {
