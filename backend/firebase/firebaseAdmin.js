@@ -1,12 +1,12 @@
 const admin = require("firebase-admin");
 require("dotenv").config();
 
-const serviceAccount = require("./firebase-service-account.json");
+const serviceAccount = require("./firebase-service-account.json"); 
 
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: "handymanapp-b6e50.firebasestorage.app",  // ✅ Fix bucket name
+  storageBucket: "handymanapp-b6e50.firebasestorage.app",  //Bucket name
 });
 
 const db = admin.firestore();

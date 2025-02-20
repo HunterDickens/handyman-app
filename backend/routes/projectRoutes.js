@@ -4,7 +4,7 @@ const { verifyFirebaseToken } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
-// **1️⃣ Create a New Repair Project**
+// **create a New Repair Project**
 router.post("/", verifyFirebaseToken, async (req, res) => {
   try {
     const { title, description, materials } = req.body;
@@ -34,7 +34,7 @@ router.post("/", verifyFirebaseToken, async (req, res) => {
   }
 });
 
-// **2️⃣ Get All Projects for a User**
+// ** Get All Projects for a User**
 router.get("/", verifyFirebaseToken, async (req, res) => {
   try {
     const userId = req.user.uid;
@@ -55,14 +55,14 @@ router.get("/", verifyFirebaseToken, async (req, res) => {
   }
 });
 
-// **3️⃣ Update a Project Status**
+// ** Update a Project Status**
 router.patch("/:projectId", verifyFirebaseToken, async (req, res) => {
   try {
     const { projectId } = req.params;
     const { status } = req.body;
     const userId = req.user.uid;
 
-    if (!["in-progress", "completed", "abandoned"].includes(status)) {
+    if (!["in-progress", "completed", "abandoned"].includes(status)) {   //** Need to have this as a pop up so that user can update project */
       return res.status(400).json({ error: "Invalid status" });
     }
 
@@ -82,7 +82,7 @@ router.patch("/:projectId", verifyFirebaseToken, async (req, res) => {
   }
 });
 
-// **4️⃣ Delete a Project**
+// ** Delete a Project**
 router.delete("/:projectId", verifyFirebaseToken, async (req, res) => {
   try {
     const { projectId } = req.params;
