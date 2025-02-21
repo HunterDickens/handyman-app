@@ -6,8 +6,9 @@ const morgan = require("morgan");
 const authRoutes = require("./routes/authRoutes");
 const uploadRoutes = require("./routes/uploadRoutes"); 
 const projectRoutes = require("./routes/projectRoutes"); 
-const diagnoseRoutes = require("./routes/diagnoseRoutes");
+//const diagnoseRoutes = require("./routes/diagnoseRoutes");
 const generateInstructionsRoutes = require("./routes/generateInstructionsRoutes"); // Import the new route
+const costEstimationRoutes = require("./routes/costEstimationRoutes");
 
 const app = express();
 
@@ -20,8 +21,9 @@ app.use(morgan("dev"));
 app.use("/api/auth", authRoutes);
 app.use("/api/upload", uploadRoutes); 
 app.use("/api/projects", projectRoutes); 
-app.use("/api/diagnose", diagnoseRoutes);
+// app.use("/api/diagnose", diagnoseRoutes); // May need in the future
 app.use("/api", generateInstructionsRoutes);
+app.use("/api/cost", costEstimationRoutes);
 
 // Test Route
 app.get("/", (req, res) => {

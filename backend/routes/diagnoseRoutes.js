@@ -1,5 +1,7 @@
-// routes/generateInstructionsRoutes.js
-const express = require("express");
+/*
+
+//routes/generateInstructionsRoutes.js  /
+//const express = require("express");
 const { OpenAI } = require("openai"); // Correct import for OpenAI
 require("dotenv").config();
 
@@ -39,3 +41,4 @@ router.post("/generate-instructions", async (req, res) => {
 });
 
 module.exports = router;
+*/
