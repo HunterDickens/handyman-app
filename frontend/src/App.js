@@ -1,14 +1,45 @@
 import React from "react";
-import { AuthProvider } from "./context/AuthContext";
-import LoginPage from "./pages/LoginPage";
-import Dashboard from "./pages/Dashboard";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  NavLink,
+} from "react-router-dom";
+import Signup from "./pages/Signup";
+import Login from "./pages/Login";
+import styles from "./App.module.css";
 
 const App = () => {
   return (
-    <AuthProvider>
-      <LoginPage />
-      <Dashboard />
-    </AuthProvider>
+    <Router>
+      <nav>
+        <NavLink
+          to="/"
+          className={({ isActive }) => (isActive ? styles.active : "")}
+        >
+          Home
+        </NavLink>
+        |
+        <NavLink
+          to="/signup"
+          className={({ isActive }) => (isActive ? styles.active : "")}
+        >
+          Signup
+        </NavLink>{" "}
+        |
+        <NavLink
+          to="/login"
+          className={({ isActive }) => (isActive ? styles.active : "")}
+        >
+          Login
+        </NavLink>
+      </nav>
+      <Routes>
+        <Route path="/" element={<h1>Home Page</h1>} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+      </Routes>
+    </Router>
   );
 };
 
