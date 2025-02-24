@@ -26,7 +26,6 @@ const verifyFirebaseToken = async (req, res, next) => {
   }
 };
 
-// **User Signup (Register)**
 router.post("/signup", async (req, res) => {
   try {
     const { email, password, name } = req.body;
@@ -35,22 +34,44 @@ router.post("/signup", async (req, res) => {
       return res.status(400).json({ error: "Email and password are required" });
     }
 
-    // Create a user in Firebase Auth
-    const userRecord = await auth.createUser({ email, password });
+    // ✅ Check if the user already exists in Firebase Auth
+    let userRecord;
+    try {
+      userRecord = await auth.getUserByEmail(email);
+      console.log("✅ User already exists in Firebase Auth:", userRecord.uid);
+    } catch (error) {
+      if (error.code === "auth/user-not-found") {
+        // ✅ Create user in Firebase Auth if not found
+        userRecord = await auth.createUser({ email, password });
+        console.log("✅ New Firebase Auth User Created:", userRecord.uid);
+      } else {
+        console.error("❌ Firebase Auth Error:", error);
+        return res.status(400).json({ error: "Failed to check existing user" });
+      }
+    }
 
-    // Store user profile in Firestore
+    // ✅ Check if the user is already in Firestore
+    const userDoc = await db.collection("users").doc(userRecord.uid).get();
+    if (userDoc.exists) {
+      console.log("✅ User already exists in Firestore:", userRecord.uid);
+      return res.status(200).json({ message: "User already exists", user: userRecord });
+    }
+
+    // ✅ Store user profile in Firestore
     await db.collection("users").doc(userRecord.uid).set({
       name: name || "New User",
       email: userRecord.email,
       createdAt: new Date(),
     });
 
+    console.log("✅ User added to Firestore:", userRecord.uid);
     res.status(201).json({ message: "User created successfully", user: userRecord });
   } catch (error) {
-    console.error("Signup Error:", error);
+    console.error("❌ Signup Error:", error);
     res.status(400).json({ error: error.message });
   }
 });
+
 
 // **User Login (Firebase ID Token)**
 router.post("/login", async (req, res) => {
