@@ -1,18 +1,42 @@
 import React, { useState } from "react";
 import { auth } from "../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import axios from "axios";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async (e) => {
-    e.preventDeafult();
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
     try {
-      await auth.signInWithEmailAndPassword(email, password);
+      // ✅ Step 1: Authenticate user with Firebase
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const idToken = await user.getIdToken();
+
+      console.log("✅ Firebase Auth User Logged In:", user);
+      console.log("📤 Sending request to backend:", { email });
+
+      // ✅ Step 2: Send Firebase token to backend API for verification
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/login",
+        { email }, // Only send email, no password
+        { headers: { Authorization: `Bearer ${idToken}`, "Content-Type": "application/json" } }
+      );
+
+      console.log("✅ Server Response:", response.data);
       alert("Login successful!");
     } catch (err) {
-      setError(err.message);
+      console.error("❌ Login Error:", err.response?.data || err.message);
+      setError(err.response?.data?.error || "Failed to log in. Try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -23,17 +47,19 @@ const Login = () => {
       <form onSubmit={handleLogin}>
         <input
           type="email"
-          placeholder="email"
+          placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <input
           type="password"
-          placeholder="password"
+          placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">Login</button>
+        <button type="submit" disabled={loading}>
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
     </div>
   );
