@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { auth } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -9,6 +10,8 @@ const Signup = () => {
   const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const navigate = useNavigate(); // ✅ React Router for redirection
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -22,17 +25,20 @@ const Signup = () => {
       const idToken = await user.getIdToken();
 
       console.log("✅ Firebase Auth User Created:", user);
-      console.log("📤 Sending request to backend:", { email, name });
 
-      // ✅ Step 2: Send user details to backend API to store in Firestore
-      const response = await axios.post(
+      // ✅ Step 2: Send user details to backend API
+      await axios.post(
         "http://localhost:5000/api/auth/signup",
-        { email, password, name }, // ✅ Ensure all fields are sent
+        { email, password, name },
         { headers: { Authorization: `Bearer ${idToken}`, "Content-Type": "application/json" } }
       );
 
-      console.log("✅ Server Response:", response.data);
-      alert("Sign up successful! You can log in now.");
+      console.log("✅ Server Response: User stored in backend");
+
+      // ✅ Step 3: Show success message & redirect to login
+      alert("Sign up successful! Please log in.");
+      navigate("/login");
+
     } catch (err) {
       console.error("❌ Signup Error:", err.response?.data || err.message);
       setError(err.response?.data?.error || "Failed to sign up. Try again.");
@@ -42,29 +48,32 @@ const Signup = () => {
   };
 
   return (
-    <div>
+    <div className="container mt-5">
       <h2>Sign Up</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {error && <p className="text-danger">{error}</p>}
       <form onSubmit={handleSignUp}>
         <input
           type="text"
           placeholder="Full Name"
           value={name}
           onChange={(e) => setName(e.target.value)}
+          className="form-control mb-3"
         />
         <input
           type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          className="form-control mb-3"
         />
         <input
           type="password"
           placeholder="Password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          className="form-control mb-3"
         />
-        <button type="submit" disabled={loading}>
+        <button type="submit" className="btn btn-primary w-100" disabled={loading}>
           {loading ? "Signing up..." : "Sign Up"}
         </button>
       </form>
