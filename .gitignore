@@ -56,3 +56,4 @@ node_modules/
 package-lock.json
 frontend/node_modules/
 package-lock.json
+backend/firebase/firebase-service-account.json
