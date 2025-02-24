@@ -1,0 +1,88 @@
+/* General Styling */
+body,
+html {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  height: 100%;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* background: linear-gradient(to right, #007bff, #0056b3); */
+  background: black;
+  color: white;
+  text-align: center;
+}
+
+/* Welcome Page Container */
+.welcomeContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+}
+
+/* Welcome Box */
+.welcomeBox {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 40px;
+  border-radius: 10px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+  max-width: 450px;
+  width: 90%;
+  backdrop-filter: blur(10px);
+}
+
+/* Welcome Text */
+h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+/* Button Container */
+.btnContainer {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+/* Button Styles */
+.btn {
+  padding: 12px 24px;
+  font-size: 1rem;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: 0.3s ease-in-out;
+  font-weight: bold;
+}
+
+/* Primary Button */
+.btnPrimary {
+  background: #007bff;
+  color: white;
+  border: none;
+}
+
+.btnPrimary:hover {
+  background: #0056b3;
+}
+
+/* Secondary Button */
+.btnSecondary {
+  background: #28a745;
+  color: white;
+  border: none;
+}
+
+.btnSecondary:hover {
+  background: #1e7e34;
+}
