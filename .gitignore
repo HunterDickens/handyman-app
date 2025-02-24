@@ -54,3 +54,5 @@ backend/firebase/firebase-service-account.json
 .lsp/.cache/db.transit.json
 node_modules/
 package-lock.json
+frontend/node_modules/
+package-lock.json
