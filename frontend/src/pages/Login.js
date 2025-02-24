@@ -26,7 +26,7 @@ const Login = () => {
       // ✅ Step 2: Send Firebase token to backend API for verification
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
-        { email }, // Only send email, no password
+        { email, password }, // Include both email and password
         { headers: { Authorization: `Bearer ${idToken}`, "Content-Type": "application/json" } }
       );
 
