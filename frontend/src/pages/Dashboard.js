@@ -7,21 +7,18 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true); // ✅ Add loading state
 
-  // ✅ Fetch user details
   useEffect(() => {
-    const fetchUser = async () => {
-      const currentUser = auth.currentUser;
+    const unsubscribe = auth.onAuthStateChanged(async (currentUser) => {
       if (currentUser) {
         setUser({
           email: currentUser.email,
           uid: currentUser.uid,
         });
 
-        const idToken = await currentUser.getIdToken();
-        
-        // ✅ Fetch user's projects
         try {
+          const idToken = await currentUser.getIdToken();
           const response = await axios.get("http://localhost:5000/api/projects", {
             headers: { Authorization: `Bearer ${idToken}` },
           });
@@ -29,41 +26,42 @@ const Dashboard = () => {
         } catch (error) {
           console.error("Error fetching projects:", error);
         }
+      } else {
+        navigate("/login"); // ✅ Redirect to login if not authenticated
       }
-    };
 
-    fetchUser();
-  }, []);
+      setLoading(false); // ✅ Stop loading once auth state is determined
+    });
 
-  // ✅ Handle Logout
-  const handleLogout = () => {
-    auth.signOut();
+    return () => unsubscribe(); // ✅ Cleanup listener
+  }, [navigate]);
+
+  const handleLogout = async () => {
+    await auth.signOut();
     navigate("/login");
   };
 
   return (
     <div className="container mt-5">
       <h2 className="text-center">Welcome to Your Dashboard</h2>
-      
-      {user ? (
+
+      {loading ? (
+        <p className="text-center">Loading user data...</p>
+      ) : user ? (
         <p className="text-center">Logged in as: <strong>{user.email}</strong></p>
       ) : (
         <p className="text-center text-danger">Error fetching user data</p>
       )}
 
       <div className="d-flex justify-content-center gap-3">
-        {/* ✅ Navigate to Projects */}
         <button className="btn btn-primary" onClick={() => navigate("/projects")}>
           View Projects
         </button>
-
-        {/* ✅ Logout Button */}
         <button className="btn btn-danger" onClick={handleLogout}>
           Logout
         </button>
       </div>
 
-      {/* ✅ Display User's Projects */}
       <div className="mt-4">
         <h4>Your Repair Projects</h4>
         {projects.length > 0 ? (
