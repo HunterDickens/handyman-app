@@ -2,38 +2,42 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { auth } from "../firebase";
-import { Form, Button, Modal } from "react-bootstrap"; // ✅ Import Bootstrap Components
+import { Form, Button, Modal } from "react-bootstrap"; // ✅ Bootstrap Components
 
 const Projects = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [newProject, setNewProject] = useState({ title: "", description: "", materials: "" });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // ✅ Show loading state
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
 
-  // ✅ Fetch Projects
+  // ✅ Fetch Projects when User is Authenticated
   useEffect(() => {
-    const fetchProjects = async () => {
-      try {
-        const user = auth.currentUser;
-        if (!user) return;
-        const idToken = await user.getIdToken();
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        try {
+          const idToken = await user.getIdToken();
+          const response = await axios.get("http://localhost:5000/api/projects", {
+            headers: { Authorization: `Bearer ${idToken}` },
+          });
 
-        const response = await axios.get("http://localhost:5000/api/projects", {
-          headers: { Authorization: `Bearer ${idToken}` },
-        });
-
-        setProjects(response.data.projects);
-      } catch (err) {
-        console.error("Error fetching projects:", err);
-        setError("Failed to load projects.");
+          setProjects(response.data.projects);
+        } catch (err) {
+          console.error("Error fetching projects:", err);
+          setError("Failed to load projects.");
+        } finally {
+          setLoading(false); // ✅ Stop loading once data is fetched
+        }
+      } else {
+        setLoading(false);
+        navigate("/login"); // ✅ Redirect if no user
       }
-    };
+    });
 
-    fetchProjects();
-  }, []);
+    return () => unsubscribe(); // ✅ Clean up listener
+  }, [navigate]);
 
   // ✅ Handle Input Change
   const handleInputChange = (e) => {
@@ -58,7 +62,6 @@ const Projects = () => {
 
       setProjects([...projects, { ...newProject, id: response.data.id, status: "in-progress" }]);
       setNewProject({ title: "", description: "", materials: "" });
-    
     } catch (err) {
       console.error("Error creating project:", err);
       setError("Failed to create project.");
@@ -113,71 +116,83 @@ const Projects = () => {
       setError("Failed to delete project.");
     }
   };
+
   return (
     <div className="container mt-5">
       <h2 className="text-center">Repair Projects</h2>
       {error && <p className="text-danger text-center">{error}</p>}
 
-      {/* ✅ New Project Form */}
-      <Form onSubmit={handleCreateProject} className="mb-4">
-        <Form.Group>
-          <Form.Label>Title</Form.Label>
-          <Form.Control
-            type="text"
-            name="title"
-            placeholder="Project title"
-            value={newProject.title}
-            onChange={handleInputChange}
-            required
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Description</Form.Label>
-          <Form.Control
-            as="textarea"
-            name="description"
-            placeholder="Project description"
-            value={newProject.description}
-            onChange={handleInputChange}
-          />
-        </Form.Group>
-        <Form.Group>
-          <Form.Label>Materials (comma-separated)</Form.Label>
-          <Form.Control
-            type="text"
-            name="materials"
-            placeholder="Wood, nails, glue"
-            value={newProject.materials}
-            onChange={handleInputChange}
-          />
-        </Form.Group>
-        <Button type="submit" className="mt-3 w-100" disabled={loading}>
-          {loading ? "Creating..." : "Create Project"}
-        </Button>
-      </Form>
+      {/* ✅ Show Loading Message */}
+      {loading ? (
+        <p className="text-center">Loading projects...</p>
+      ) : (
+        <>
+          {/* ✅ New Project Form */}
+          <Form onSubmit={handleCreateProject} className="mb-4">
+            <Form.Group>
+              <Form.Label>Title</Form.Label>
+              <Form.Control
+                type="text"
+                name="title"
+                placeholder="Project title"
+                value={newProject.title}
+                onChange={handleInputChange}
+                required
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                name="description"
+                placeholder="Project description"
+                value={newProject.description}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Form.Group>
+              <Form.Label>Materials (comma-separated)</Form.Label>
+              <Form.Control
+                type="text"
+                name="materials"
+                placeholder="Wood, nails, glue"
+                value={newProject.materials}
+                onChange={handleInputChange}
+              />
+            </Form.Group>
+            <Button type="submit" className="mt-3 w-100" disabled={loading}>
+              {loading ? "Creating..." : "Create Project"}
+            </Button>
+          </Form>
 
-      {/* ✅ Project List */}
-      <ul className="list-group">
-        {projects.map((project) => (
-          <li key={project.id} className="list-group-item d-flex justify-content-between align-items-center">
-            <div>
-              <h5>{project.title}</h5>
-              <p>{project.description}</p>
-              <span className={`badge ${project.status === "completed" ? "bg-success" : "bg-warning"}`}>
-                {project.status}
-              </span>
-            </div>
-            <div>
-              <Button variant="info" className="me-2" onClick={() => handleOpenModal(project)}>
-                Update Status
-              </Button>
-              <Button variant="danger" onClick={() => handleDeleteProject(project.id)}>
-                Delete
-              </Button>
-            </div>
-          </li>
-        ))}
-      </ul>
+          {/* ✅ Project List */}
+          <ul className="list-group">
+            {projects.length > 0 ? (
+              projects.map((project) => (
+                <li key={project.id} className="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <h5>{project.title}</h5>
+                    <p>{project.description}</p>
+                    <span className={`badge ${project.status === "completed" ? "bg-success" : "bg-warning"}`}>
+                      {project.status}
+                    </span>
+                  </div>
+                  <div>
+                    <Button variant="info" className="me-2" onClick={() => handleOpenModal(project)}>
+                      Update Status
+                    </Button>
+                    <Button variant="danger" onClick={() => handleDeleteProject(project.id)}>
+                      Delete
+                    </Button>
+                  </div>
+                </li>
+              ))
+            ) : (
+              <p className="text-center text-muted">No projects found. Start by creating one!</p>
+            )}
+          </ul>
+        </>
+      )}
 
       {/* ✅ Status Update Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
