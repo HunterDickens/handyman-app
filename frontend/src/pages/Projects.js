@@ -173,8 +173,13 @@ const Projects = () => {
       {/* ✅ Project List */}
       <ul className="list-group">
         {projects.map((project) => (
-          <li key={project.id} className="list-group-item d-flex justify-content-between align-items-center">
-            <div>
+          <li 
+             key={project.id} 
+             className="list-group-item d-flex justify-content-between align-items-center"
+             //onClick={() => navigate(`/projects/${project.id}`)}
+             //style={{ cursor: "pointer" }}
+          >
+            <div> 
               <h5>{project.title}</h5>
               <p>{project.description}</p>
               <span className={`badge ${project.status === "completed" ? "bg-success" : "bg-warning"}`}>
