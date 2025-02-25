@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { auth } from "../firebase";
 import { Form, Button, Modal } from "react-bootstrap"; // ✅ Import Bootstrap Components
+import ImageUpload from "../components/ImageUpload";
 
 const Projects = () => {
     const navigate = useNavigate();
@@ -113,6 +114,19 @@ const Projects = () => {
       setError("Failed to delete project.");
     }
   };
+
+  // ✅ Image Upload Success Popup
+  const handleImageUploadSuccess = (imageUrl) => {
+    setProjects((prevProjects) =>
+      prevProjects.map((project) =>
+        project.id === selectedProject.id
+          ? { ...project, images: [...project.images, imageUrl] }
+          : project
+      )
+    );
+    //handleCloseModal();
+  };
+
   return (
     <div className="container mt-5">
       <h2 className="text-center">Repair Projects</h2>
@@ -194,6 +208,8 @@ const Projects = () => {
           <Button variant="danger" className="w-100" onClick={() => handleUpdateStatus("abandoned")}>
             Abandoned
           </Button>
+          <hr />
+          <ImageUpload projectId={selectedProject?.id} onUploadSuccess={handleImageUploadSuccess}/>
         </Modal.Body>
       </Modal>
 
