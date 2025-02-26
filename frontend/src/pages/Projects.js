@@ -176,8 +176,8 @@ const Projects = () => {
           <li 
              key={project.id} 
              className="list-group-item d-flex justify-content-between align-items-center"
-             //onClick={() => navigate(`/projects/${project.id}`)}
-             //style={{ cursor: "pointer" }}
+             onClick={() => navigate(`/projects/${project.id}`)}
+             style={{ cursor: "pointer" }}
           >
             <div> 
               <h5>{project.title}</h5>
@@ -187,10 +187,20 @@ const Projects = () => {
               </span>
             </div>
             <div>
-              <Button variant="info" className="me-2" onClick={() => handleOpenModal(project)}>
+              <Button variant="info" className="me-2" onClick={(e) => 
+                {
+                  e.stopPropagation();
+                  handleOpenModal(project);
+                }}
+              >
                 Update Status
               </Button>
-              <Button variant="danger" onClick={() => handleDeleteProject(project.id)}>
+              <Button variant="danger" onClick={(e) => 
+                {
+                  e.stopPropagation();
+                  handleDeleteProject(project.id);
+                }}
+              >
                 Delete
               </Button>
             </div>
