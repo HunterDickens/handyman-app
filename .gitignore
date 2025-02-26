@@ -58,3 +58,7 @@ frontend/node_modules/
 package-lock.json
 backend/firebase/firebase-service-account.json
 /.clj-kondo
+frontend/node_modules/.cache/.eslintcache
+frontend/node_modules/.cache/default-development/1.pack
+frontend/node_modules/.cache/default-development/index.pack
+frontend/node_modules/.cache/default-development/index.pack.old

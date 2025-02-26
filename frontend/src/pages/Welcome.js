@@ -28,12 +28,20 @@ const Welcome = () => {
       {/* Main Content (Ensuring It Stays Visible Above Video) */}
       <div className="text-center position-relative" style={{ zIndex: "1" }}>
         {/* Logo */}
-        <img 
+            <img 
           src="/Handyman.png" 
           alt="Handyman Logo" 
-          className="img-fluid mb-4" 
-          style={{ maxWidth: "300px" }}
-        />
+          className="position-absolute" 
+             style={{ 
+                maxWidth: "180px", 
+               bottom: "-250px", 
+              left: "50%", 
+            transform: "translateX(-50%)", 
+             zIndex: "2"
+            }}  
+          />
+
+
 
         <h1 className="display-3 fw-bold text-warning">Welcome to Handyman</h1>
         <p className="lead text-light">
