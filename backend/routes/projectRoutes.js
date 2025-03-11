@@ -82,6 +82,27 @@ router.patch("/:projectId", verifyFirebaseToken, async (req, res) => {
   }
 });
 
+// Route to get all data of a specific project
+router.get("/:projectId", verifyFirebaseToken, async (req, res) => {
+  try {
+    const { projectId } = req.params;
+    const userId = req.user.uid;
+
+    const projectRef = db.collection("projects").doc(projectId);
+    const project = await projectRef.get();
+
+    if (!project.exists || project.data().userId !== userId) {
+      return res.status(404).json({ error: "Project not found or unauthorized" });
+    }
+
+    const projectData = project.data();
+    res.status(200).json({ project: projectData });
+  } catch (error) {
+    console.error("Error fetching project data:", error);
+    res.status(500).json({ error: "Failed to fetch project data" });
+  }
+});
+
 // ** Delete a Project**
 router.delete("/:projectId", verifyFirebaseToken, async (req, res) => {
   try {

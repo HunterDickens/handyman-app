@@ -2,7 +2,8 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { auth } from "../firebase";
-import { Form, Button, Modal } from "react-bootstrap"; // ✅ Bootstrap Components
+import { Form, Button, Modal } from "react-bootstrap"; // ✅ Import Bootstrap Components
+import ImageUpload from "../components/ImageUpload";
 
 const Projects = () => {
   const navigate = useNavigate();
@@ -116,7 +117,6 @@ const Projects = () => {
       setError("Failed to delete project.");
     }
   };
-
   return (
     <div className="container mt-5">
       <h2 className="text-center">Repair Projects</h2>
@@ -165,34 +165,28 @@ const Projects = () => {
             </Button>
           </Form>
 
-          {/* ✅ Project List */}
-          <ul className="list-group">
-            {projects.length > 0 ? (
-              projects.map((project) => (
-                <li key={project.id} className="list-group-item d-flex justify-content-between align-items-center">
-                  <div>
-                    <h5>{project.title}</h5>
-                    <p>{project.description}</p>
-                    <span className={`badge ${project.status === "completed" ? "bg-success" : "bg-warning"}`}>
-                      {project.status}
-                    </span>
-                  </div>
-                  <div>
-                    <Button variant="info" className="me-2" onClick={() => handleOpenModal(project)}>
-                      Update Status
-                    </Button>
-                    <Button variant="danger" onClick={() => handleDeleteProject(project.id)}>
-                      Delete
-                    </Button>
-                  </div>
-                </li>
-              ))
-            ) : (
-              <p className="text-center text-muted">No projects found. Start by creating one!</p>
-            )}
-          </ul>
-        </>
-      )}
+      {/* ✅ Project List */}
+      <ul className="list-group">
+        {projects.map((project) => (
+          <li key={project.id} className="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <h5>{project.title}</h5>
+              <p>{project.description}</p>
+              <span className={`badge ${project.status === "completed" ? "bg-success" : "bg-warning"}`}>
+                {project.status}
+              </span>
+            </div>
+            <div>
+              <Button variant="info" className="me-2" onClick={() => handleOpenModal(project)}>
+                Update Status
+              </Button>
+              <Button variant="danger" onClick={() => handleDeleteProject(project.id)}>
+                Delete
+              </Button>
+            </div>
+          </li>
+        ))}
+      </ul>
 
       {/* ✅ Status Update Modal */}
       <Modal show={showModal} onHide={() => setShowModal(false)}>
@@ -209,6 +203,8 @@ const Projects = () => {
           <Button variant="danger" className="w-100" onClick={() => handleUpdateStatus("abandoned")}>
             Abandoned
           </Button>
+          <hr />
+          <ImageUpload projectId={selectedProject?.id} onUploadSuccess={handleImageUploadSuccess}/>
         </Modal.Body>
       </Modal>
 
