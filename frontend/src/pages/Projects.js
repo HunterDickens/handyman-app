@@ -216,9 +216,12 @@ const Projects = () => {
         <Button variant="secondary" onClick={() => navigate("/dashboard")}>
           ← Back to Dashboard
         </Button>
-      </div>
-    </div>
-  );
-};
+\      </div>
+    </>
+  )}
+</div>
+);
+}
+
 
 export default Projects;
