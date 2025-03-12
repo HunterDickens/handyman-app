@@ -36,6 +36,7 @@ const Projects = () => {
       }
     });
 
+
     return () => unsubscribe(); // ✅ Clean up listener
   }, [navigate]);
 
@@ -116,6 +117,8 @@ const Projects = () => {
       setError("Failed to delete project.");
     }
   };
+
+
 
   return (
     <div className="container mt-5">
