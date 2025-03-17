@@ -3,6 +3,7 @@ import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import "./Login.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -10,7 +11,7 @@ const Login = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate(); // ✅ Enables page redirection
+  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -18,14 +19,12 @@ const Login = () => {
     setLoading(true);
 
     try {
-      // ✅ Authenticate user with Firebase
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       const idToken = await user.getIdToken();
 
       console.log("✅ Firebase Auth User Logged In:", user);
 
-      // ✅ Send Firebase token to backend for verification
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
         { email, password },
@@ -33,10 +32,7 @@ const Login = () => {
       );
 
       console.log("✅ Server Response:", response.data);
-
-      // ✅ Redirect user to Dashboard
       navigate("/dashboard");
-
     } catch (err) {
       console.error("❌ Login Error:", err.response?.data || err.message);
       setError(err.response?.data?.error || "Failed to log in. Try again.");
@@ -46,45 +42,52 @@ const Login = () => {
   };
 
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-md-4">
-          <div className="card shadow-lg p-4">
-            <h2 className="text-center text-primary">Login</h2>
-            
-            {error && <p className="text-danger text-center">{error}</p>}
-            
-            <form onSubmit={handleLogin}>
-              <div className="mb-3">
-                <label className="form-label">Email</label>
-                <input
-                  type="email"
-                  className="form-control"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="mb-3">
-                <label className="form-label">Password</label>
-                <input
-                  type="password"
-                  className="form-control"
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              <button type="submit" className="btn btn-primary w-100" disabled={loading}>
-                {loading ? <span className="spinner-border spinner-border-sm"></span> : "Login"}
-              </button>
-            </form>
+    <div className="login-container">
+      <div className="login-card">
+        <h2 className="login-title">Login</h2>
+        {error && <p className="login-error">{error}</p>}
+        
+        <form onSubmit={handleLogin}>
+          <div className="login-input-group">
+            <label>Email</label>
+            <input
+              type="email"
+              className="login-input"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
-        </div>
+
+          <div className="login-input-group">
+            <label>Password</label>
+            <input
+              type="password"
+              className="login-input"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="login-button"
+            disabled={loading}
+          >
+            {loading ? "Logging in..." : "Login"}
+          </button>
+        </form>
+        
+        <p className="login-footer">
+          Don't have an account? 
+          <button 
+            onClick={() => navigate("/signup")} 
+            className="login-signup-link"
+          >Sign Up</button>
+        </p>
       </div>
     </div>
   );
