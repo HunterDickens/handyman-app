@@ -29,6 +29,7 @@ router.post("/", verifyFirebaseToken, async (req, res) => {
       userId,
       createdAt: admin.firestore.Timestamp.now(),
       subprojects: [], // ✅ Ensure subprojects is an array at creation
+        subprojects: [], // Store references to subprojects here
     };
 
     const projectRef = await db.collection("projects").add(newProject);
@@ -158,6 +159,11 @@ router.post("/:projectId/subprojects", verifyFirebaseToken, async (req, res) => 
     console.error("🔥 Error adding subproject:", error);
     res.status(500).json({ error: "Failed to add subproject." });
   }
+});
+
+// **Add a Subproject to an Existing Project**
+router.post("/:projectId/subprojects", verifyFirebaseToken, async (req, res) => {
+  
 });
 
 /**
