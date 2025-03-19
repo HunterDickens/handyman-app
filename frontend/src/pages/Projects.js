@@ -215,6 +215,11 @@ const Projects = () => {
               </li>
             ))}
           </ul>
+          
+          {/* ✅ Back to Dashboard Button */}
+            <Button variant="secondary" className="mt-3" onClick={() => navigate("/dashboard")}>
+              Back to Dashboard
+            </Button>
 
           {/* ✅ Status Update Modal */}
           <Modal show={showModal} onHide={() => setShowModal(false)}>

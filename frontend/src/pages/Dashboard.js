@@ -101,6 +101,18 @@ const Dashboard = () => {
         </Button>
       </div>
 
+      <div className="d-flex justify-content-center gap-3">
+        <button
+          className="btn btn-primary"
+          onClick={() => navigate("/projects")}
+        >
+          View Projects
+        </button>
+        <button className="btn btn-danger" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+
       <div className="mt-4">
         <h4>Your Repair Projects</h4>
       </div>
