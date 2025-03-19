@@ -1,8 +1,26 @@
 const express = require("express");
 const { db } = require("../firebase/firebaseAdmin");
+const { FieldValue } = require("firebase-admin/firestore");
 const { verifyFirebaseToken } = require("../middleware/authMiddleware"); 
 
 const router = express.Router();
+
+// Helper function to create a new project or subproject
+async function createProject({ title, description, materials, userId }) {
+  const newProject = {
+    title,
+    description: description || "",
+    materials: materials || [],
+    userId,
+    status: "in-progress",
+    createdAt: new Date(),
+    images: [], // Store image URLs here
+    subprojects: [], // Store references to subprojects here
+  };
+
+  const projectRef = await db.collection("projects").add(newProject);
+  return { id: projectRef.id, ...newProject };
+}
 
 // **create a New Repair Project**
 router.post("/", verifyFirebaseToken, async (req, res) => {
@@ -13,22 +31,10 @@ router.post("/", verifyFirebaseToken, async (req, res) => {
     if (!title) {
       return res.status(400).json({ error: "Project title is required" });
     }
-    
-    const newProject = {
-        title,
-        description: description || "",
-        materials: materials || [],
-        userId,
-        status: "in-progress",
-        createdAt: new Date(),
-        images: [], // ✅ Store image URLs here
-        subprojects: [], // Store references to subprojects here
-      };
-      
 
-    const projectRef = await db.collection("projects").add(newProject);
+    const newProject = await createProject({ title, description, materials, userId });
 
-    res.status(201).json({ message: "Project created", id: projectRef.id });
+    res.status(201).json({ message: "Project created", id: newProject.id });
   } catch (error) {
     console.error("Error creating project:", error);
     res.status(500).json({ error: "Failed to create project" });
@@ -37,7 +43,39 @@ router.post("/", verifyFirebaseToken, async (req, res) => {
 
 // **Add a Subproject to an Existing Project**
 router.post("/:projectId/subprojects", verifyFirebaseToken, async (req, res) => {
-  
+  try {
+    const { projectId } = req.params;
+    const { title, description, materials } = req.body;
+    const userId = req.user.uid; // Get user ID from token
+
+    if (!title) {
+      return res.status(400).json({ error: "Subproject title is required" });
+    }
+
+    // Create the subproject using the same helper function
+    const newSubproject = await createProject({ title, description, materials, userId });
+
+    /* // Add the subproject reference to the parent project
+    const subproject = {
+      id: newSubproject.id,
+      title: newSubproject.title,
+      description: newSubproject.description,
+      materials: newSubproject.materials,
+      status: newSubproject.status,
+    }; */
+
+    await db.collection("projects").doc(projectId).update({
+      //subprojects: admin.firestore.FieldValue.arrayUnion(newSubproject.id),
+      subprojects: FieldValue.arrayUnion(newSubproject.id),
+    });
+
+    res.status(201).json({
+      message: `Subproject added successfully with ID: ${newSubproject.id}`,
+    });
+  } catch (error) {
+    console.error("Error adding subproject:", error);
+    res.status(500).json({ error: "Failed to add subproject" });
+  }
 });
 
 // ** Get All Projects for a User**
