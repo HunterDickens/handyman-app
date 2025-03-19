@@ -22,6 +22,7 @@ router.post("/", verifyFirebaseToken, async (req, res) => {
         status: "in-progress",
         createdAt: new Date(),
         images: [], // ✅ Store image URLs here
+        subprojects: [], // Store references to subprojects here
       };
       
 
@@ -32,6 +33,11 @@ router.post("/", verifyFirebaseToken, async (req, res) => {
     console.error("Error creating project:", error);
     res.status(500).json({ error: "Failed to create project" });
   }
+});
+
+// **Add a Subproject to an Existing Project**
+router.post("/:projectId/subprojects", verifyFirebaseToken, async (req, res) => {
+  
 });
 
 // ** Get All Projects for a User**
