@@ -6,31 +6,33 @@ const morgan = require("morgan");
 const authRoutes = require("./routes/authRoutes");
 const uploadRoutes = require("./routes/uploadRoutes"); 
 const projectRoutes = require("./routes/projectRoutes"); 
-//const diagnoseRoutes = require("./routes/diagnoseRoutes");
-const generateInstructionsRoutes = require("./routes/generateInstructionsRoutes"); // Import the new route
+const generateInstructionsRoutes = require("./routes/generateInstructionsRoutes");
 const costEstimationRoutes = require("./routes/costEstimationRoutes");
 
 const app = express();
 
-// Middleware
-app.use(express.json());
-app.use(cors());
+// ✅ Middleware
+app.use(express.json({ limit: "10mb", extended: true }));  // ✅ Fix for JSON parsing
+app.use(cors({
+  origin: "*",  // Change to specific frontend domain for security
+  methods: ["GET", "POST", "PATCH", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
 app.use(morgan("dev"));
 
-// Register API Routes
+// ✅ Register API Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/upload", uploadRoutes); 
-app.use("/api/projects", projectRoutes); 
-// app.use("/api/diagnose", diagnoseRoutes); // May need in the future
+app.use("/api/projects", projectRoutes);  // ✅ Projects routes
+app.use("/api/uploads", uploadRoutes);    // ✅ Uploads for images only
 app.use("/api", generateInstructionsRoutes);
 app.use("/api/cost", costEstimationRoutes);
 
-// Test Route
+// ✅ Test Route
 app.get("/", (req, res) => {
   res.send("Handyman API is running...");
 });
 
-// Start Server
+// ✅ Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
