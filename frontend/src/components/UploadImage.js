@@ -1,39 +1,47 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { Button, Alert, Image, OverlayTrigger, Tooltip } from "react-bootstrap";
 import axios from "axios";
 import { auth } from "../firebase";
-import { Form, Button, Image } from "react-bootstrap";
 
-const UploadImage = ({ projectId, project, setProject }) => {
-  const [image, setImage] = useState(null);
+const UploadImage = ({
+  targetId,
+  uploadEndpoint,
+  onUploadSuccess,
+  existingImages,
+  buttonText,
+  buttonVariant,
+  buttonSize,
+  customTrigger,
+  hideDefaultButton = false,
+}) => {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleUploadImage = async (e) => {
-    e.preventDefault();
-    if (!image) {
-      setError("Please select an image to upload.");
-      return;
-    }
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
     setUploading(true);
-    const formData = new FormData();
-    formData.append("image", image);
+    setError("");
 
     try {
       const user = auth.currentUser;
       if (!user) return;
       const idToken = await user.getIdToken();
 
-      const response = await axios.post(`http://localhost:5000/api/uploads/${id}`, formData, {
-        headers: { Authorization: `Bearer ${idToken}`, "Content-Type": "multipart/form-data" }
-      });      
+      const formData = new FormData();
+      formData.append("image", file);
 
-      setProject((prev) => ({
-        ...prev,
-        images: [...(prev?.images || []), response.data.imageUrl],
-      }));
-      setImage(null);
+      const response = await axios.post(uploadEndpoint, formData, {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      onUploadSuccess(response.data.imageUrl);
     } catch (err) {
+      console.error("Error uploading image:", err);
       setError("Failed to upload image.");
     } finally {
       setUploading(false);
@@ -41,25 +49,40 @@ const UploadImage = ({ projectId, project, setProject }) => {
   };
 
   return (
-    <>
-      <h4>Uploaded Images:</h4>
-      {project?.images?.length > 0 && (
-        <div className="mb-3 d-flex flex-wrap">
-          {project.images.map((img, i) => (
-            <Image key={i} src={img} alt={`Project Image ${i}`} fluid rounded className="m-2" style={{ maxWidth: "300px" }} />
-          ))}
-        </div>
+    <div>
+      <input
+        type="file"
+        id={`file-upload-${targetId}`}
+        accept="image/*"
+        onChange={handleFileChange}
+        style={{ display: "none" }}
+      />
+
+      {customTrigger && (
+        <label htmlFor={`file-upload-${targetId}`} style={{ display: "block" }}>
+          {customTrigger}
+        </label>
       )}
 
-      <Form onSubmit={handleUploadImage} className="mb-3">
-        <Form.Group>
-          <Form.Control type="file" onChange={(e) => setImage(e.target.files[0])} />
-        </Form.Group>
-        <Button type="submit" className="mt-2" disabled={uploading}>
-          {uploading ? "Uploading..." : "Upload"}
+      {!hideDefaultButton && (
+        <Button
+          as="label"
+          htmlFor={`file-upload-${targetId}`}
+          variant={buttonVariant}
+          size={buttonSize}
+          disabled={uploading}
+          className="mt-2"
+        >
+          {uploading ? "Uploading..." : buttonText}
         </Button>
-      </Form>
-    </>
+      )}
+
+      {error && (
+        <Alert variant="danger" className="mt-2">
+          {error}
+        </Alert>
+      )}
+    </div>
   );
 };
 

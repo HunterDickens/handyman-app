@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { auth } from "../firebase";
 import { Button, Spinner, Alert, ListGroup, Image } from "react-bootstrap";
+import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 const ProjectDetails = () => {
   const { id } = useParams();
@@ -55,7 +56,7 @@ const ProjectDetails = () => {
           ))}
         </div>
       ) : (
-        <p>No images uploaded yet.</p>
+        <AddPhotoAlternateIcon />
       )}
 
       {/* ✅ Subprojects Section */}

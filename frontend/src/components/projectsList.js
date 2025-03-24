@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useNavigate } from "react-router-dom";
 import { styled } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import List from "@mui/material/List";
@@ -9,12 +10,14 @@ import ConfirmationModal from "./confirmationModal"; // Import the new modal
 import axios from "axios";
 import { auth } from "../firebase";
 import Button from "@mui/material/Button";
+import styles from "./projectsList.module.css";
 
 const Demo = styled("div")(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
 }));
 
 const ProjectList = ({ list, setProjects }) => {
+  const navigate = useNavigate();
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
   const [projectToDelete, setProjectToDelete] = React.useState(null);
 
@@ -94,14 +97,20 @@ const ProjectList = ({ list, setProjects }) => {
   };
 
   return (
-    <Box sx={{ flexGrow: 1, maxWidth: 752 }}>
+    <Box sx={{ flexGrow: 1 }}>
       <Demo>
-        <List>
+        <List className={styles.list}>
           {list.map((project) => (
-            <ListItem key={project.id}>
-              <ListItemText primary={project.title} />
-              <ListItemText secondary={project.description} />
-              <ListItemText secondary={project.materials} />
+            <ListItem key={project.id} className={styles.listItem}>
+              <div
+                onClick={() => navigate(`/projects/${project.id}`)}
+                className={styles.itemWrapper}
+              >
+                <ListItemText
+                  primary={project.title}
+                  secondary={project.description}
+                />
+              </div>
               <EditProjectModal
                 data={project}
                 onUpdateProject={handleUpdateProject}
