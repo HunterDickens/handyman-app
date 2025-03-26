@@ -9,11 +9,13 @@ const router = express.Router();
  */
 router.post("/", verifyFirebaseToken, async (req, res) => {
   try {
-    const { title, description, materials } = req.body;
+    const { title, description, materials, status } = req.body;
     const userId = req.user.uid;
 
     if (!title || !description) {
-      return res.status(400).json({ error: "Title and description are required." });
+      return res
+        .status(400)
+        .json({ error: "Title and description are required." });
     }
 
     const formattedMaterials = Array.isArray(materials)
@@ -27,9 +29,9 @@ router.post("/", verifyFirebaseToken, async (req, res) => {
       description,
       materials: formattedMaterials,
       userId,
+      status: status || "in-progress",
       createdAt: admin.firestore.Timestamp.now(),
       subprojects: [], // ✅ Ensure subprojects is an array at creation
-        subprojects: [], // Store references to subprojects here
     };
 
     const projectRef = await db.collection("projects").add(newProject);
@@ -108,67 +110,69 @@ router.delete("/:projectId", verifyFirebaseToken, async (req, res) => {
   }
 });
 
+/** * ✅ Add a Subproject*/
 
-/**
- * ✅ Add a Subproject
- */
-router.post("/:projectId/subprojects", verifyFirebaseToken, async (req, res) => {
-  try {
-    const { projectId } = req.params;
-    const { title } = req.body;
-    const userId = req.user.uid;
+router.post(
+  "/:projectId/subprojects",
+  verifyFirebaseToken,
+  async (req, res) => {
+    try {
+      const { projectId } = req.params;
+      const { title } = req.body;
+      const userId = req.user.uid;
 
-    if (!title || title.trim() === "") {
-      return res.status(400).json({ error: "Subproject title is required." });
+      if (!title || title.trim() === "") {
+        return res.status(400).json({ error: "Subproject title is required." });
+      }
+
+      const projectRef = db.collection("projects").doc(projectId);
+      const project = await projectRef.get();
+
+      if (!project.exists) {
+        console.log("🚨 Project not found:", projectId);
+        return res.status(404).json({ error: "Project not found." });
+      }
+
+      const projectData = project.data();
+      if (projectData.userId !== userId) {
+        return res.status(403).json({ error: "Unauthorized access." });
+      }
+
+      // ✅ Ensure subprojects field exists
+      if (!Array.isArray(projectData.subprojects)) {
+        await projectRef.update({ subprojects: [] });
+      }
+
+      // ✅ Create subproject object
+      const subproject = {
+        id: new Date().getTime().toString(),
+        title,
+        status: "in-progress",
+        createdAt: admin.firestore.Timestamp.now(),
+      };
+
+      // ✅ Update Firestore with new subproject
+      await projectRef.update({
+        subprojects: admin.firestore.FieldValue.arrayUnion(subproject),
+      });
+
+      console.log("✅ Subproject Added:", subproject);
+      res.status(201).json({ message: "Subproject added.", subproject });
+    } catch (error) {
+      console.error("🔥 Error adding subproject:", error);
+      res.status(500).json({ error: "Failed to add subproject." });
     }
-
-    const projectRef = db.collection("projects").doc(projectId);
-    const project = await projectRef.get();
-
-    if (!project.exists) {
-      console.log("🚨 Project not found:", projectId);
-      return res.status(404).json({ error: "Project not found." });
-    }
-
-    const projectData = project.data();
-    if (projectData.userId !== userId) {
-      return res.status(403).json({ error: "Unauthorized access." });
-    }
-
-    // ✅ Ensure subprojects field exists
-    if (!Array.isArray(projectData.subprojects)) {
-      await projectRef.update({ subprojects: [] });
-    }
-
-    // ✅ Create subproject object
-    const subproject = {
-      id: new Date().getTime().toString(),
-      title,
-      status: "in-progress",
-      createdAt: admin.firestore.Timestamp.now(),
-    };
-
-    // ✅ Update Firestore with new subproject
-    await projectRef.update({
-      subprojects: admin.firestore.FieldValue.arrayUnion(subproject),
-    });
-
-    console.log("✅ Subproject Added:", subproject);
-    res.status(201).json({ message: "Subproject added.", subproject });
-  } catch (error) {
-    console.error("🔥 Error adding subproject:", error);
-    res.status(500).json({ error: "Failed to add subproject." });
   }
-});
+);
 
 // **Add a Subproject to an Existing Project**
-router.post("/:projectId/subprojects", verifyFirebaseToken, async (req, res) => {
-  
-});
+router.post(
+  "/:projectId/subprojects",
+  verifyFirebaseToken,
+  async (req, res) => {}
+);
 
-/**
- * ✅ Get All Projects for a User
- */
+/* ✅ Get All Projects for a User*/
 router.get("/", verifyFirebaseToken, async (req, res) => {
   try {
     const userId = req.user.uid;
@@ -192,51 +196,60 @@ router.get("/", verifyFirebaseToken, async (req, res) => {
     res.status(500).json({ error: "Failed to fetch projects." });
   }
 });
-/**
- * ✅ Update a Subproject (e.g., Mark as Completed)
- */
-router.patch("/:projectId/subprojects/:subprojectId", verifyFirebaseToken, async (req, res) => {
-  try {
-    const { projectId, subprojectId } = req.params;
-    const { title, status } = req.body; // Accept updates to title or status
-    const userId = req.user.uid;
 
-    if (!["in-progress", "completed", "abandoned"].includes(status)) {   //** Need to have this as a pop up so that user can update project */
-      return res.status(400).json({ error: "Invalid status" });
+ /* ✅ Update a Subproject (e.g., Mark as Completed)  */
+ 
+router.patch(
+  "/:projectId/subprojects/:subprojectId",
+  verifyFirebaseToken,
+  async (req, res) => {
+    try {
+      const { projectId, subprojectId } = req.params;
+      const { title, status } = req.body; // Accept updates to title or status
+      const userId = req.user.uid;
+
+      if (!["in-progress", "completed", "abandoned"].includes(status)) {
+        //** Need to have this as a pop up so that user can update project */
+        return res.status(400).json({ error: "Invalid status" });
+      }
+
+      const projectRef = db.collection("projects").doc(projectId);
+      const project = await projectRef.get();
+
+      if (!project.exists) {
+        return res.status(404).json({ error: "Project not found." });
+      }
+
+      const projectData = project.data();
+      if (projectData.userId !== userId) {
+        return res.status(403).json({ error: "Unauthorized access." });
+      }
+
+      let subprojects = projectData.subprojects || [];
+      const subprojectIndex = subprojects.findIndex(
+        (sp) => sp.id === subprojectId
+      );
+
+      if (subprojectIndex === -1) {
+        return res.status(404).json({ error: "Subproject not found." });
+      }
+
+      // ✅ Update subproject fields only if provided in the request
+      if (title) subprojects[subprojectIndex].title = title;
+      if (status) subprojects[subprojectIndex].status = status;
+
+      await projectRef.update({ subprojects });
+
+      console.log(`✅ Subproject Updated: ${subprojectId}`);
+      res
+        .status(200)
+        .json({ message: "Subproject updated successfully.", subprojects });
+    } catch (error) {
+      console.error("🔥 Error updating subproject:", error);
+      res.status(500).json({ error: "Failed to update subproject." });
     }
-
-    const projectRef = db.collection("projects").doc(projectId);
-    const project = await projectRef.get();
-
-    if (!project.exists) {
-      return res.status(404).json({ error: "Project not found." });
-    }
-
-    const projectData = project.data();
-    if (projectData.userId !== userId) {
-      return res.status(403).json({ error: "Unauthorized access." });
-    }
-
-    let subprojects = projectData.subprojects || [];
-    const subprojectIndex = subprojects.findIndex((sp) => sp.id === subprojectId);
-
-    if (subprojectIndex === -1) {
-      return res.status(404).json({ error: "Subproject not found." });
-    }
-
-    // ✅ Update subproject fields only if provided in the request
-    if (title) subprojects[subprojectIndex].title = title;
-    if (status) subprojects[subprojectIndex].status = status;
-
-    await projectRef.update({ subprojects });
-
-    console.log(`✅ Subproject Updated: ${subprojectId}`);
-    res.status(200).json({ message: "Subproject updated successfully.", subprojects });
-  } catch (error) {
-    console.error("🔥 Error updating subproject:", error);
-    res.status(500).json({ error: "Failed to update subproject." });
   }
-});
+);
 
 /**
  * ✅ Get a Single Project by ID
@@ -268,37 +281,44 @@ router.get("/:projectId", verifyFirebaseToken, async (req, res) => {
 /**
  * ✅ Delete a Subproject
  */
-router.delete("/:projectId/subprojects/:subprojectId", verifyFirebaseToken, async (req, res) => {
-  try {
-    const { projectId, subprojectId } = req.params;
-    const userId = req.user.uid;
+router.delete(
+  "/:projectId/subprojects/:subprojectId",
+  verifyFirebaseToken,
+  async (req, res) => {
+    try {
+      const { projectId, subprojectId } = req.params;
+      const userId = req.user.uid;
 
-    const projectRef = db.collection("projects").doc(projectId);
-    const project = await projectRef.get();
+      const projectRef = db.collection("projects").doc(projectId);
+      const project = await projectRef.get();
 
-    if (!project.exists) {
-      return res.status(404).json({ error: "Project not found." });
+      if (!project.exists) {
+        return res.status(404).json({ error: "Project not found." });
+      }
+
+      const projectData = project.data();
+      if (projectData.userId !== userId) {
+        return res.status(403).json({ error: "Unauthorized access." });
+      }
+
+      const updatedSubprojects = projectData.subprojects
+        ? projectData.subprojects.filter((sp) => sp.id !== subprojectId)
+        : [];
+
+      await projectRef.update({
+        subprojects: updatedSubprojects,
+      });
+
+      console.log("✅ Subproject Deleted:", subprojectId);
+      res.status(200).json({
+        message: "Subproject deleted.",
+        subprojects: updatedSubprojects,
+      });
+    } catch (error) {
+      console.error("🔥 Error deleting subproject:", error);
+      res.status(500).json({ error: "Failed to delete subproject." });
     }
-
-    const projectData = project.data();
-    if (projectData.userId !== userId) {
-      return res.status(403).json({ error: "Unauthorized access." });
-    }
-
-    const updatedSubprojects = projectData.subprojects
-      ? projectData.subprojects.filter((sp) => sp.id !== subprojectId)
-      : [];
-
-    await projectRef.update({
-      subprojects: updatedSubprojects,
-    });
-
-    console.log("✅ Subproject Deleted:", subprojectId);
-    res.status(200).json({ message: "Subproject deleted.", subprojects: updatedSubprojects });
-  } catch (error) {
-    console.error("🔥 Error deleting subproject:", error);
-    res.status(500).json({ error: "Failed to delete subproject." });
   }
-});
+);
 
 module.exports = router;

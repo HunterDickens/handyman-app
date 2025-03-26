@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../authContext/authContext"; // Importing the useAuth hook
+import { useAuth } from "../authContext/authContext";
 import axios from "axios";
 import ProjectTabs from "../components/projectsTabs";
-import { Button } from "@mui/material";
-import CreateProjectModal from "../components/createProjectModal";
-import { auth } from "../firebase";
+import CreateProjectButton from "../components/CreateProjectButton";
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const { user, loading, logout } = useAuth(); // Accessing the user, loading, and logout from the context
+  const { user, loading, logout } = useAuth();
   const [projects, setProjects] = useState([]);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [, setError] = useState("");
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -28,6 +26,7 @@ const Dashboard = () => {
           setProjects(response.data.projects);
         } catch (error) {
           console.error("Error fetching projects:", error);
+          setError("Failed to load projects.");
         }
       }
     };
@@ -35,40 +34,33 @@ const Dashboard = () => {
     if (user) {
       fetchProjects();
     } else {
-      navigate("/login"); // Redirect to login if user is not logged in
+      navigate("/login");
     }
   }, [user, navigate]);
 
   const handleLogout = async () => {
-    await logout(); // Use the logout method from the AuthContext
+    await logout();
     navigate("/login");
   };
 
-  const handleCreateProject = async (newProject, resetForm) => {
-    try {
-      const user = auth.currentUser;
-      if (!user) return;
-      const idToken = await user.getIdToken();
-
-      // Send the new project data to the backend
-      const response = await axios.post(
-        "http://localhost:5000/api/projects",
-        { ...newProject, materials: newProject.materials.split(",") },
-        { headers: { Authorization: `Bearer ${idToken}` } }
-      );
-
-      // Add the new project to the local state
-      setProjects((prevProjects) => [
-        ...prevProjects,
-        { ...newProject, id: response.data.id, status: "in-progress" },
-      ]);
-      resetForm();
-      setIsCreateModalOpen(false); // Close the modal
-    } catch (err) {
-      console.error("Error creating project:", err);
-      setError("Failed to create project.");
+  const refreshProjects = async () => {
+    if (user) {
+      try {
+        const idToken = await user.getIdToken();
+        const response = await axios.get(
+          "http://localhost:5000/api/projects",
+          {
+            headers: { Authorization: `Bearer ${idToken}` },
+          }
+        );
+        setProjects(response.data.projects);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+        setError("Failed to load projects.");
+      }
     }
   };
+
 
   return (
     <div className="container mt-5">
@@ -90,15 +82,14 @@ const Dashboard = () => {
         </button>
       </div>
 
-      {/* Add a button to open the Create Project Modal */}
       <div className="mt-4 d-flex justify-content-center">
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setIsCreateModalOpen(true)}
-        >
-          Create New Project
-        </Button>
+        <CreateProjectButton
+          isOpen={isCreateModalOpen}
+          onOpen={() => setIsCreateModalOpen(true)}
+          onClose={() => setIsCreateModalOpen(false)}
+          onProjectCreated={refreshProjects}
+          title={"+ New Project"}
+        />
       </div>
 
       <div className="d-flex justify-content-center gap-3">
@@ -108,22 +99,14 @@ const Dashboard = () => {
         >
           View Projects
         </button>
-        <button className="btn btn-danger" onClick={handleLogout}>
-          Logout
-        </button>
       </div>
+
+      {error && <p className="text-danger text-center">{error}</p>}
 
       <div className="mt-4">
         <h4>Your Repair Projects</h4>
       </div>
       <ProjectTabs key={projects.length} projectsData={projects} />
-
-      {/* Render the Create Project Modal */}
-      <CreateProjectModal
-        open={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onCreateProject={handleCreateProject}
-      />
     </div>
   );
 };
