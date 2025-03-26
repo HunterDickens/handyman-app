@@ -27,6 +27,7 @@ router.post("/", verifyFirebaseToken, async (req, res) => {
     const newProject = {
       title,
       description,
+      visibility: "private",
       materials: formattedMaterials,
       userId,
       status: status || "in-progress",
@@ -251,6 +252,30 @@ router.patch(
   }
 );
 
+// Get public projects
+router.get("/public", async (req, res) => {
+  try {
+    const publicProjectsSnapshot = await db
+      .collection("projects")
+      .where("visibility", "==", "public")
+      .get();
+
+    if (publicProjectsSnapshot.empty) {
+      return res.status(404).json({ error: "No public projects found." });
+    }
+
+    const publicProjects = publicProjectsSnapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    res.status(200).json(publicProjects);
+  } catch (error) {
+    console.error("🔥 Error fetching public projects:", error);
+    res.status(500).json({ error: "Failed to fetch public projects." });
+  }
+});
+
 /**
  * ✅ Get a Single Project by ID
  */
@@ -267,8 +292,10 @@ router.get("/:projectId", verifyFirebaseToken, async (req, res) => {
     }
 
     const projectData = project.data();
-    if (projectData.userId !== userId) {
-      return res.status(403).json({ error: "Unauthorized access." });
+    if (projectData.visibility !== "public") {
+      if (projectData.userId !== userId) {
+        return res.status(403).json({ error: "Unauthorized access." });
+      }
     }
 
     res.status(200).json({ project: { id: project.id, ...projectData } });
