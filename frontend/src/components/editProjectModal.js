@@ -14,7 +14,14 @@ const ProjectModal = ({ data, onUpdateProject }) => {
 
   return (
     <div>
-      <Button onClick={handleOpen}>Edit</Button>
+      <Button
+        onClick={handleOpen}
+        variant="contained"
+        color="success"
+        style={{ minWidth: "88px" }}
+      >
+        Edit
+      </Button>
       <Modal
         open={open}
         onClose={handleClose}

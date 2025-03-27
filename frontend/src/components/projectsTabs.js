@@ -2,9 +2,10 @@ import React, { useState, useEffect } from "react";
 import Box from "@mui/material/Box";
 import Tab from "@mui/material/Tab";
 import { TabContext, TabList, TabPanel } from "@mui/lab";
-import ProjectList from "./projectsList";
+import ProjectCard from "./ProjectCard";
 import axios from "axios";
 import { auth } from "../firebase";
+import styles from "./projectsTabs.module.css";
 
 const ProjectTabs = ({ projectsData }) => {
   // <-- Fix here, correctly destructure
@@ -48,21 +49,32 @@ const ProjectTabs = ({ projectsData }) => {
   return (
     <Box sx={{ width: "100%", typography: "body1" }}>
       <TabContext value={value}>
-        <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
-          <TabList onChange={handleChange} aria-label="lab API tabs example">
+        <Box className={styles.contentBox}>
+          <TabList
+            centered
+            onChange={handleChange}
+            aria-label="lab API tabs example"
+          >
             <Tab label="In Progress" value="1" />
             <Tab label="Completed" value="2" />
             <Tab label="Abandoned" value="3" />
           </TabList>
         </Box>
-        <TabPanel value="1">
-          <ProjectList list={inProgressList} setProjects={setProjects} />
+
+        <TabPanel value="1" className={styles.tabPanel}>
+          <div className={styles["project-grid"]}>
+            <ProjectCard list={inProgressList} setProjects={setProjects} />
+          </div>
         </TabPanel>
-        <TabPanel value="2">
-          <ProjectList list={completedList} setProjects={setProjects} />
+        <TabPanel value="2" className={styles.tabPanel}>
+          <div className={styles["project-grid"]}>
+            <ProjectCard list={completedList} setProjects={setProjects} />
+          </div>
         </TabPanel>
-        <TabPanel value="3">
-          <ProjectList list={abandonedList} setProjects={setProjects} />
+        <TabPanel value="3" className={styles.tabPanel}>
+          <div className={styles["project-grid"]}>
+            <ProjectCard list={abandonedList} setProjects={setProjects} />
+          </div>
         </TabPanel>
       </TabContext>
     </Box>

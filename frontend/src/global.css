@@ -1,0 +1,10 @@
+:root {
+  /*dark mode*/
+  --primary-color: #0f172a;
+  --secondary-color: #1e293b;
+  --primary-blue: #3b82f6;
+  --secondary-blue: #2563eb;
+  --primary-text: #fff;
+  --secondary-text: #00000099;
+  --hover-text: #808080;
+}
