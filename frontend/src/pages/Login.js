@@ -3,7 +3,7 @@ import { auth } from "../firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./Login.css";
+import styles from "./Login.module.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -19,7 +19,11 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
       const idToken = await user.getIdToken();
 
@@ -28,7 +32,12 @@ const Login = () => {
       const response = await axios.post(
         "http://localhost:5000/api/auth/login",
         { email, password },
-        { headers: { Authorization: `Bearer ${idToken}`, "Content-Type": "application/json" } }
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json",
+          },
+        }
       );
 
       console.log("✅ Server Response:", response.data);
@@ -42,17 +51,17 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-      <div className="login-card">
-        <h2 className="login-title">Login</h2>
-        {error && <p className="login-error">{error}</p>}
-        
+    <div className={styles["login-container"]}>
+      <div className={styles["login-card"]}>
+        <h2 className={styles["login-title"]}>Login</h2>
+        {error && <p className={styles["login-error"]}>{error}</p>}
+
         <form onSubmit={handleLogin}>
-          <div className="login-input-group">
+          <div className={styles["login-input-group"]}>
             <label>Email</label>
             <input
               type="email"
-              className="login-input"
+              className={styles["login-input"]}
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -60,11 +69,11 @@ const Login = () => {
             />
           </div>
 
-          <div className="login-input-group">
+          <div className={styles["login-input-group"]}>
             <label>Password</label>
             <input
               type="password"
-              className="login-input"
+              className={styles["login-input"]}
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -72,21 +81,19 @@ const Login = () => {
             />
           </div>
 
-          <button
-            type="submit"
-            className="login-button"
-            disabled={loading}
-          >
+          <button type="submit" className={styles["login-button"]} disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
-        
-        <p className="login-footer">
-          Don't have an account? 
-          <button 
-            onClick={() => navigate("/signup")} 
-            className="login-signup-link"
-          >Sign Up</button>
+
+        <p className={styles["login-footer"]}>
+          Don't have an account?
+          <button
+            onClick={() => navigate("/signup")}
+            className={styles["login-signup-link"]}
+          >
+            Sign Up
+          </button>
         </p>
       </div>
     </div>

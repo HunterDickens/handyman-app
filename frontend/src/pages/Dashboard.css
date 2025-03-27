@@ -1,0 +1,68 @@
+/* Outer container: dark background, full height */
+.dashboard-container {
+  background-color: var(--primary-color); /* Dark navy */
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Main card: now wider (90% up to 1200px) */
+.dashboard-card {
+  background-color: var(--secondary-color);
+  padding: 40px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 1200px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  color: var(--primary-text);
+  text-align: center;
+}
+
+.dashboard-header {
+  margin-bottom: 20px;
+}
+
+/* Menu icon in top-left */
+.menu-icon {
+  text-align: left;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+/* Title & subtitle text */
+.dashboard-title {
+  color: var(--primary-text);
+  font-weight: 600;
+  margin: 0;
+}
+
+.dashboard-subtitle {
+  color: #cbd5e1;
+  margin-top: 8px;
+}
+
+/* Logout button row */
+.dashboard-buttons {
+  margin-bottom: 20px;
+}
+
+.btn-logout {
+  background-color: #ef4444;
+  color: var(--primary-text);
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.btn-logout:hover {
+  background-color: #dc2626;
+}
+
+/* Projects heading */
+.projects-heading {
+  font-size: 20px;
+  margin-top: 30px;
+}

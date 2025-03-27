@@ -1,0 +1,38 @@
+/* Each project box */
+.project-box :global .MuiCard-root {
+  background-color: var(--primary-blue);
+  color: var(--primary-text);
+  width: 200px;
+  height: 250px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.project-box :global .MuiCard-root {
+  background-color: var(--primary-blue);
+}
+.project-box :global .MuiCard-root:hover {
+  background-color: var(--secondary-blue);
+}
+
+.project-box :global .MuiCardActions-root {
+  display: flex;
+  justify-content: center;
+  justify-content: space-evenly;
+}
+
+/* The "+" new project box */
+.new-project {
+  background-color: transparent;
+  border: 2px dashed var(--primary-blue);
+  color: var(--primary-blue);
+  font-size: 32px;
+  font-weight: bold;
+  transition: 0.2s ease;
+}
+
+.new-project:hover {
+  background-color: rgba(59, 130, 246, 0.1);
+}
