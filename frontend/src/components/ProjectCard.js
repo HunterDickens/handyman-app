@@ -97,31 +97,37 @@ const ProjectCard = ({ list, setProjects }) => {
     <>
       {list.map((project) => (
         <div className={styles["project-box"]}>
-          <Card key={project.id} sx={{ maxWidth: 345 }}>
+          <Card
+            key={project.id}
+            sx={{ maxWidth: 345 }}
+            onClick={() => navigate(`/projects/${project.id}`)}
+          >
             <CardMedia
               sx={{ height: 100 }}
               // image="/static/images/cards/contemplative-reptile.jpg"
               title={project.title}
-              onClick={() => navigate(`/projects/${project.id}`)}
             />
 
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">
                 {project.title}
               </Typography>
-              <Typography variant="body2" sx={{ color: "text.secondary" }}>
+              <Typography variant="body2" className={styles.secondary}>
                 {project.description}
               </Typography>
             </CardContent>
-            <CardActions>
+            <CardActions onClick={(e) => e.stopPropagation()}>
               <EditProjectModal
+                title={"Edit Project"}
                 data={project}
                 onUpdateProject={handleUpdateProject}
               />
               <Button
                 variant="contained"
                 color="error"
-                onClick={() => handleDeleteClick(project)}
+                onClick={() => {
+                  handleDeleteClick(project);
+                }}
                 style={{ marginLeft: "10px" }}
               >
                 Delete

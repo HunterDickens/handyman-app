@@ -6,6 +6,7 @@ import {
   ListItemText,
   Checkbox,
 } from "@mui/material";
+import { blueGrey } from '@mui/material/colors';
 
 const CheckboxList = ({
   items = [],
@@ -47,6 +48,12 @@ const CheckboxList = ({
                 slotProps={{
                   input: {
                     "aria-labelledby": labelId,
+                  },
+                }}
+                sx={{
+                  color: blueGrey[500],
+                  '&.Mui-checked': {
+                    color: blueGrey[600],
                   },
                 }}
               />

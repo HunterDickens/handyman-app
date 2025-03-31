@@ -51,7 +51,9 @@ const UpdateProjectDetails = ({ project, onUpdateProject, onClose }) => {
         <MenuItem value="abandoned">Abandoned</MenuItem>
       </Select>
       <Box mt={2} display="flex" justifyContent="space-between">
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose} color="error">
+          Cancel
+        </Button>
         <Button onClick={handleUpdate} variant="contained" color="primary">
           Save Changes
         </Button>

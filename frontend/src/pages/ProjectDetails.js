@@ -1,22 +1,34 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useAuth } from "../authContext/authContext";
 import axios from "axios";
 import { auth } from "../firebase";
-import { Button, Spinner, Alert, ListGroup, Row, Col } from "react-bootstrap";
-import AddSubprojectForm from "../components/AddSubprojectForm";
+import {
+  Spinner,
+  Alert,
+  ListGroup,
+  Row,
+  Col,
+  Button,
+  Image,
+} from "react-bootstrap";
 import UploadImage from "../components/UploadImage";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import SlideGallery from "../components/SlideGallery";
 import CheckboxList from "../components/CheckBoxList";
 
+import styles from "./ProjectDetails.module.css";
+import CreateProjectButton from "../components/CreateProjectButton";
+
 const ProjectDetails = () => {
+  const { user, loading, logout } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
   const [subprojects, setSubprojects] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [activeStep, setActiveStep] = useState(0);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchProjectDetails = async () => {
@@ -37,8 +49,6 @@ const ProjectDetails = () => {
       } catch (err) {
         console.error("Error loading project:", err);
         setError("Failed to load project details.");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -67,22 +77,32 @@ const ProjectDetails = () => {
     return <Spinner animation="border" className="d-block mx-auto mt-5" />;
   }
 
-  return (
-    <div className="container-fluid mt-5 ps-5 pe-5">
-      {error && <Alert variant="danger">{error}</Alert>}
+  const refreshProjects = async () => {
+    if (user) {
+      try {
+        const idToken = await user.getIdToken();
+        const response = await axios.get(
+          `http://localhost:5000/api/projects/${id}`,
+          {
+            headers: { Authorization: `Bearer ${idToken}` },
+          }
+        );
+        setProject(response.data.project);
+        setSubprojects(response.data.project.subprojects || []);
+      } catch (error) {
+        console.error("Error fetching project:", error);
+        setError("Failed to load project.");
+      }
+    }
+  };
 
+  return (
+    <div className={`container-fluid pt-5 ps-5 pe-5 ${styles.body}`}>
+      {error && <Alert variant="danger">{error}</Alert>}
       <Row>
-        <Col md={4} lg={3} className="border-end border-primary border-2 pe-4">
+        <Col md={4} lg={3} className="border-end  border-2 pe-4">
           <div className="sticky-top" style={{ top: "20px" }}>
-            <h1
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              {project.title}
-            </h1>
+            <h1 className={styles.projectTitle}>{project?.title}</h1>
             <div className="mb-3">
               {project?.images?.length > 0 ? (
                 <SlideGallery images={project.images} height={400} />
@@ -93,22 +113,8 @@ const ProjectDetails = () => {
                   onUploadSuccess={handleProjectImageUpload}
                   existingImages={project?.images}
                   customTrigger={
-                    <div
-                      className="text-center py-4"
-                      style={{
-                        border: "1px dashed #ccc",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                        transition: "all 0.3s",
-                        ":hover": {
-                          backgroundColor: "#f8f9fa",
-                          borderColor: "#adb5bd",
-                        },
-                      }}
-                    >
-                      <AddPhotoAlternateIcon
-                        style={{ fontSize: "3rem", color: "#6c757d" }}
-                      />
+                    <div className={`text-center py-4 ${styles.imageText}`}>
+                      <AddPhotoAlternateIcon className={styles.imageIcon} />
                       <p className="mt-2 text-muted">Click to upload images</p>
                     </div>
                   }
@@ -150,24 +156,43 @@ const ProjectDetails = () => {
             <h4 className="mt-4">Subprojects:</h4>
             {subprojects?.length > 0 ? (
               <ListGroup className="mb-3">
-                {subprojects.map((sp) => (
+                {subprojects?.map((sp) => (
                   <ListGroup.Item
                     key={sp.id}
                     className="d-flex flex-column mb-3"
                   >
-                    <h6>{sp.title}</h6>
-                    <p>{sp.description}</p>
-
+                    <h6>{sp?.title}</h6>
+                    <p>{sp?.description}</p>
+                    { <div className="mb-2">
+                        {sp.images.map((img, i) => (
+                          <Image
+                            key={i}
+                            src={img}
+                            alt={`Subproject ${i}`}
+                            fluid
+                            rounded
+                            className="m-1"
+                            style={{ maxWidth: "150px" }}
+                          />
+                        ))}
+                      </div>
+                    }
                     <UploadImage
                       targetId={sp.id}
                       uploadEndpoint={`http://localhost:5000/api/uploads/projects/${id}/subprojects/${sp.id}/upload`}
                       onUploadSuccess={(imageUrl) =>
                         handleSubprojectImageUpload(sp.id, imageUrl)
                       }
+                      customTrigger={
+                        <div className={`text-center py-4 ${styles.imageText}`}>
+                          <AddPhotoAlternateIcon className={styles.imageIcon} />
+                          <p className="mt-2 text-muted">
+                            Click to upload images
+                          </p>
+                        </div>
+                      }
+                      hideDefaultButton={true}
                       existingImages={sp.images}
-                      buttonText="Add Subproject Image"
-                      buttonVariant="outline-secondary"
-                      buttonSize="sm"
                     />
                   </ListGroup.Item>
                 ))}
@@ -176,15 +201,20 @@ const ProjectDetails = () => {
               <p>No subprojects yet.</p>
             )}
 
-            <h4 className="mt-4">Add a Subproject:</h4>
-            <AddSubprojectForm projectId={id} setSubprojects={setSubprojects} />
-
-            <Button className="mt-3" onClick={() => navigate("/dashboard")}>
-              Back to Dashboard
-            </Button>
+            <CreateProjectButton
+              isOpen={isCreateModalOpen}
+              onOpen={() => setIsCreateModalOpen(true)}
+              onClose={() => setIsCreateModalOpen(false)}
+              onProjectCreated={refreshProjects}
+              title={"+ New Subproject"}
+              projectId={id}
+            />
           </div>
         </Col>
       </Row>
+      <Button className="mt-3" onClick={() => navigate("/dashboard")}>
+        Back to Dashboard
+      </Button>
     </div>
   );
 };

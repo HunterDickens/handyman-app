@@ -93,6 +93,7 @@ const Dashboard = () => {
             onClose={() => setIsCreateModalOpen(false)}
             onProjectCreated={refreshProjects}
             title={"+ New Project"}
+            mode="project"
           />
         </div>
 

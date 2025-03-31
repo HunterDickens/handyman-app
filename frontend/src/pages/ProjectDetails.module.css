@@ -1,0 +1,27 @@
+.body {
+  background-color: var(--secondary-color);
+  height: 100vh;
+  color: var(--primary-text);
+}
+.projectTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 20px;
+}
+.imageText:hover {
+  background-color: #f8f9fa;
+  border-color: #adb5db;
+}
+.imageText {
+  border: 1px dashed #ccc;
+  cursor: pointer;
+  transition: all 0.3s;
+  color: aliceblue;
+  background-color: #f8f9fa;
+  border-radius: 5px;
+}
+.imageIcon {
+  font-size: 3rem;
+  color: #6c757d;
+}

@@ -8,6 +8,8 @@ const CreateProjectButton = ({
   onClose,
   title,
   onProjectCreated,
+  
+  projectId,
 }) => {
   return (
     <>
@@ -20,6 +22,8 @@ const CreateProjectButton = ({
         onClose={onClose}
         title={title}
         onProjectCreated={onProjectCreated}
+       
+        projectId={projectId}
       />
     </>
   );
