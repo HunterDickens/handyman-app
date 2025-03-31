@@ -13,44 +13,57 @@ const CreateProjectModal = ({
   onClose,
   parentProjectId = null,
   onProjectCreated,
+  projectId,
 }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [materials, setMaterials] = useState("");
   const [error, setError] = useState("");
+  const [adding, setAdding] = useState(false);
 
   const handleCreateProject = async (e) => {
     e.preventDefault();
     if (!title.trim()) return;
-    const user = auth.currentUser;
-    if (!user) return;
 
+    setAdding(true);
     try {
+      const user = auth.currentUser;
+      if (!user) return;
       const idToken = await user.getIdToken();
-      const newProject = {
-        title,
-        description,
-        materials: materials.split(","),
-        parentProjectId,
-      };
 
-      const response = await axios.post(
-        "http://localhost:5000/api/projects",
-        newProject,
-        {
-          headers: { Authorization: `Bearer ${idToken}` },
-        }
-      );
+      if (projectId) {
+        // Subproject creation logic
+        const response = await axios.post(
+          `http://localhost:5000/api/projects/${projectId}/subprojects`,
+          { title, description, materials: materials.split(",") },
+          { headers: { Authorization: `Bearer ${idToken}` } }
+        );
 
-      console.log("Project created successfully:", response.data);
+        // Callback with new subproject data if needed
+        onProjectCreated?.(response.data.subproject);
+      } else {
+        // Regular project creation logic
+        const response = await axios.post(
+          "http://localhost:5000/api/projects",
+          {
+            title,
+            description,
+            materials: materials.split(","),
+            ...(parentProjectId && { parentProjectId }),
+          },
+          { headers: { Authorization: `Bearer ${idToken}` } }
+        );
+
+        onProjectCreated?.();
+      }
+
       resetForm();
       onClose();
-      if (onProjectCreated) {
-        onProjectCreated(); // Call the refresh function
-      }
     } catch (err) {
-      console.error("Error creating project:", err);
       setError("Failed to create project.");
+      console.error("Error:", err);
+    } finally {
+      setAdding(false);
     }
   };
 
@@ -70,7 +83,7 @@ const CreateProjectModal = ({
     >
       <Box className={styles.modalStyle}>
         <Typography id="modal-modal-title" variant="h6" component="h2">
-          {parentProjectId ? "Create Subproject" : "Create New Project"}
+          {projectId ? "Create Subproject" : "Create Project"}
         </Typography>
         {error && <Typography color="error">{error}</Typography>}
         <form onSubmit={handleCreateProject}>
@@ -98,7 +111,9 @@ const CreateProjectModal = ({
             margin="normal"
           />
           <Box mt={2} display="flex" justifyContent="space-between">
-            <Button onClick={onClose}>Cancel</Button>
+            <Button onClick={onClose} color="error">
+              Cancel
+            </Button>
             <Button type="submit" variant="contained" color="primary">
               {parentProjectId ? "Create Subproject" : "Create Project"}
             </Button>

@@ -23,6 +23,11 @@
   justify-content: space-evenly;
 }
 
+.secondary{
+  color: rgba(255, 255, 255, 0.865) ;
+
+}
+
 /* The "+" new project box */
 .new-project {
   background-color: transparent;

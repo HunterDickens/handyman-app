@@ -6,7 +6,7 @@ import Typography from "@mui/material/Typography";
 import UpdateProjectDetails from "./updateProjectDetails"; // Import new component
 import styles from "./modal.module.css";
 
-const ProjectModal = ({ data, onUpdateProject }) => {
+const EditProjectModal = ({ data, onUpdateProject, title }) => {
   const [open, setOpen] = useState(false);
 
   const handleOpen = () => setOpen(true);
@@ -30,7 +30,7 @@ const ProjectModal = ({ data, onUpdateProject }) => {
       >
         <Box className={styles.modalStyle}>
           <Typography id="modal-modal-title" variant="h6" component="h2">
-            Edit Project
+            {title}
           </Typography>
           <UpdateProjectDetails
             project={data}
@@ -43,4 +43,4 @@ const ProjectModal = ({ data, onUpdateProject }) => {
   );
 };
 
-export default ProjectModal;
+export default EditProjectModal;
