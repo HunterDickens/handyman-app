@@ -45,7 +45,13 @@ const ProjectDetails = () => {
         );
 
         setProject(response.data.project);
-        setSubprojects(response.data.project.subprojects || []);
+        // Ensure all subprojects have an images array
+        setSubprojects(
+          response.data.project.subprojects?.map((sp) => ({
+            ...sp,
+            images: Array.isArray(sp.images) ? sp.images : [],
+          })) || []
+        );
       } catch (err) {
         console.error("Error loading project:", err);
         setError("Failed to load project details.");
@@ -67,7 +73,12 @@ const ProjectDetails = () => {
     setSubprojects((prev) =>
       prev.map((sp) =>
         sp.id === subprojectId
-          ? { ...sp, images: [...(sp.images || []), imageUrl] }
+          ? {
+              ...sp,
+              images: Array.isArray(sp.images)
+                ? [...sp.images, imageUrl]
+                : [imageUrl],
+            }
           : sp
       )
     );
@@ -88,7 +99,13 @@ const ProjectDetails = () => {
           }
         );
         setProject(response.data.project);
-        setSubprojects(response.data.project.subprojects || []);
+        // Ensure all subprojects have an images array
+        setSubprojects(
+          response.data.project.subprojects?.map((sp) => ({
+            ...sp,
+            images: Array.isArray(sp.images) ? sp.images : [],
+          })) || []
+        );
       } catch (error) {
         console.error("Error fetching project:", error);
         setError("Failed to load project.");
@@ -105,7 +122,7 @@ const ProjectDetails = () => {
             <h1 className={styles.projectTitle}>{project?.title}</h1>
             <div className="mb-3">
               {project?.images?.length > 0 ? (
-                <SlideGallery images={project.images} height={400} />
+                <SlideGallery images={project?.images} height={400} />
               ) : (
                 <UploadImage
                   targetId={id}
@@ -163,22 +180,25 @@ const ProjectDetails = () => {
                   >
                     <h6>{sp?.title}</h6>
                     <p>{sp?.description}</p>
-                    { <div className="mb-2">
-                        {sp?.images.map((img, i) => (
-                          <Image
-                            key={i}
-                            src={img}
-                            alt={`Subproject ${i}`}
-                            fluid
-                            rounded
-                            className="m-1"
-                            style={{ maxWidth: "150px" }}
-                          />
-                        ))}
-                      </div>
-                    }
+                    {sp?.images &&
+                      Array.isArray(sp.images) &&
+                      sp.images.length > 0 && (
+                        <div className="mb-2">
+                          {sp.images.map((img, i) => (
+                            <Image
+                              key={i}
+                              src={img}
+                              alt={`Subproject ${i}`}
+                              fluid
+                              rounded
+                              className="m-1"
+                              style={{ maxWidth: "150px" }}
+                            />
+                          ))}
+                        </div>
+                      )}
                     <UploadImage
-                      targetId={sp.id}
+                      targetId={sp?.id}
                       uploadEndpoint={`http://localhost:5000/api/uploads/projects/${id}/subprojects/${sp.id}/upload`}
                       onUploadSuccess={(imageUrl) =>
                         handleSubprojectImageUpload(sp.id, imageUrl)
@@ -192,7 +212,7 @@ const ProjectDetails = () => {
                         </div>
                       }
                       hideDefaultButton={true}
-                      existingImages={sp.images}
+                      existingImages={sp?.images}
                     />
                   </ListGroup.Item>
                 ))}
