@@ -100,4 +100,31 @@ router.post("/projects/:projectId/subprojects/:subprojectId/upload", verifyFireb
   }
 });
 
+// **Update User Profile Picture**
+router.patch("/update-profile-picture", verifyFirebaseToken, async (req, res) => {
+  try {
+    const userId = req.user.uid; // Get user ID from verified token
+    const { profilePictureUrl } = req.body; // Get new profile picture URL from request body
+
+    if (!profilePictureUrl) {
+      return res.status(400).json({ error: "Profile picture URL is required" });
+    }
+
+    // Update the user's profile picture in Firestore
+    await db.collection("users").doc(userId).set(
+      {
+        pfp: profilePictureUrl, // Update the 'pfp' field
+      },
+      { merge: true } // Merge with existing fields
+    );
+
+    res.status(200).json({ message: "Profile picture updated successfully" });
+  } catch (error) {
+    console.error("Profile Picture Update Error:", error);
+    res.status(500).json({ error: "Failed to update profile picture" });
+  }
+});
+
+
+
 module.exports = router;
