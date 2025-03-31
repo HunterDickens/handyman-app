@@ -164,7 +164,7 @@ const ProjectDetails = () => {
                     <h6>{sp?.title}</h6>
                     <p>{sp?.description}</p>
                     { <div className="mb-2">
-                        {sp.images.map((img, i) => (
+                        {sp?.images.map((img, i) => (
                           <Image
                             key={i}
                             src={img}
