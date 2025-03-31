@@ -62,6 +62,8 @@ router.post("/signup", async (req, res) => {
       name: name || "New User",
       email: userRecord.email,
       createdAt: new Date(),
+      pfp: "https://firebasestorage.googleapis.com/v0/b/handymanapp-b6e50.firebasestorage.app/o/assets%2Fdefault-pfp.jpg?alt=media&token=55ac6b23-2e5e-4749-803d-bc7ede72df69",
+      description: "Focused on tackling repair projects and finding practical solutions.",
     });
 
     console.log("✅ User added to Firestore:", userRecord.uid);
