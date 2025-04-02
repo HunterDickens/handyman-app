@@ -17,6 +17,45 @@ const upload = multer({
   },
 });
 
+
+// ✅ Upload Image for Profile Picture
+router.post("/profilepic/", verifyFirebaseToken, upload.single("image"), async (req, res) => {
+  try {
+    const userId = req.user.uid;
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const file = req.file;
+    const filename = `users/${userId}/${Date.now()}-${file.originalname}`;
+
+    const fileRef = bucket.file(filename);
+    
+    await fileRef.save(file.buffer, { metadata: { contentType: file.mimetype } });
+    await fileRef.makePublic();
+
+    const downloadURL = `https://storage.googleapis.com/${bucket.name}/${filename}`;
+
+   /*  const projectRef = db.collection("projects").doc(projectId);
+    const project = await projectRef.get();
+
+    if (!project.exists || project.data().userId !== userId) {
+      return res.status(404).json({ error: "Project not found or unauthorized" });
+    } */
+
+    await projectRef.update({
+      images: admin.firestore.FieldValue.arrayUnion(downloadURL),
+    });
+
+    res.json({ message: "Image uploaded successfully", imageUrl: downloadURL });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to upload image" });
+  }
+});
+
+
+
 // ✅ Upload Image for a Project
 router.post("/projects/:projectId/upload", verifyFirebaseToken, upload.single("image"), async (req, res) => {
   try {
@@ -100,30 +139,7 @@ router.post("/projects/:projectId/subprojects/:subprojectId/upload", verifyFireb
   }
 });
 
-// **Update User Profile Picture**
-router.patch("/update-profile-picture", verifyFirebaseToken, async (req, res) => {
-  try {
-    const userId = req.user.uid; // Get user ID from verified token
-    const { profilePictureUrl } = req.body; // Get new profile picture URL from request body
 
-    if (!profilePictureUrl) {
-      return res.status(400).json({ error: "Profile picture URL is required" });
-    }
-
-    // Update the user's profile picture in Firestore
-    await db.collection("users").doc(userId).set(
-      {
-        pfp: profilePictureUrl, // Update the 'pfp' field
-      },
-      { merge: true } // Merge with existing fields
-    );
-
-    res.status(200).json({ message: "Profile picture updated successfully" });
-  } catch (error) {
-    console.error("Profile Picture Update Error:", error);
-    res.status(500).json({ error: "Failed to update profile picture" });
-  }
-});
 
 
 
