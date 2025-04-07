@@ -3,6 +3,9 @@ import axios from "axios";
 import { auth } from "../firebase";
 import { ListGroup, Button, Form, Image } from "react-bootstrap";
 
+// ✅ Load API base URL from environment variable
+const API_URL = process.env.REACT_APP_API_URL;
+
 const SubprojectList = ({ projectId, subprojects, setSubprojects }) => {
   const [subprojectImages, setSubprojectImages] = useState({});
 
@@ -19,7 +22,7 @@ const SubprojectList = ({ projectId, subprojects, setSubprojects }) => {
       const idToken = await user.getIdToken();
 
       const response = await axios.post(
-        `http://localhost:5000/api/projects/${projectId}/subprojects/${subprojectId}/upload`,
+        `${API_URL}/api/projects/${projectId}/subprojects/${subprojectId}/upload`,
         formData,
         { headers: { Authorization: `Bearer ${idToken}`, "Content-Type": "multipart/form-data" } }
       );

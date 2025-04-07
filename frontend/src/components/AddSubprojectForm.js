@@ -3,6 +3,9 @@ import axios from "axios";
 import { auth } from "../firebase";
 import { Button, Form } from "react-bootstrap";
 
+// ✅ Load API base URL from environment variable
+const API_URL = process.env.REACT_APP_API_URL;
+
 const AddSubprojectForm = ({ projectId, setSubprojects }) => {
   const [title, setTitle] = useState("");
   const [adding, setAdding] = useState(false);
@@ -18,7 +21,7 @@ const AddSubprojectForm = ({ projectId, setSubprojects }) => {
       const idToken = await user.getIdToken();
 
       const response = await axios.post(
-        `http://localhost:5000/api/projects/${projectId}/subprojects`,
+        `${API_URL}/api/projects/${projectId}/subprojects`,
         { title },
         { headers: { Authorization: `Bearer ${idToken}` } }
       );

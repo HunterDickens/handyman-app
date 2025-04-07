@@ -8,6 +8,9 @@ import axios from "axios";
 import { auth } from "../firebase";
 import styles from "./modal.module.css";
 
+// ✅ Load API base URL from environment variable
+const API_URL = process.env.REACT_APP_API_URL;
+
 const CreateProjectModal = ({
   open,
   onClose,
@@ -34,7 +37,7 @@ const CreateProjectModal = ({
       if (projectId) {
         // Subproject creation logic
         const response = await axios.post(
-          `http://localhost:5000/api/projects/${projectId}/subprojects`,
+          `${API_URL}/api/projects/${projectId}/subprojects`,
           { title, description, materials: materials.split(",") },
           { headers: { Authorization: `Bearer ${idToken}` } }
         );
@@ -44,7 +47,7 @@ const CreateProjectModal = ({
       } else {
         // Regular project creation logic
         const response = await axios.post(
-          "http://localhost:5000/api/projects",
+          `${API_URL}/api/projects`,
           {
             title,
             description,
