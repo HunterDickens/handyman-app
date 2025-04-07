@@ -15,30 +15,28 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      if (user) {
-        try {
-          const idToken = await user.getIdToken();
-          const response = await axios.get(
-            "http://localhost:5000/api/projects",
-            {
-              headers: { Authorization: `Bearer ${idToken}` },
-            }
-          );
-          setProjects(response.data.projects);
-        } catch (error) {
-          console.error("Error fetching projects:", error);
-          setError("Failed to load projects.");
-        }
+      try {
+        const idToken = await user.getIdToken();
+        const response = await axios.get("http://localhost:5000/api/projects", {
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
+        setProjects(response.data.projects);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+        setError("Failed to load projects.");
       }
     };
-
-    if (user) {
-      fetchProjects();
-    } else {
+  
+    if (loading) return; // Wait until Firebase auth is ready
+  
+    if (!user) {
       navigate("/login");
+    } else {
+      fetchProjects();
     }
-  }, [user, navigate]);
-
+  }, [user, loading, navigate]);
+  
+  
   const handleLogout = async () => {
     await logout();
     navigate("/login");
