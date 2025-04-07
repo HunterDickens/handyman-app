@@ -36,7 +36,6 @@ const Dashboard = () => {
     }
   }, [user, loading, navigate]);
   
-  
   const handleLogout = async () => {
     await logout();
     navigate("/login");
