@@ -7,6 +7,9 @@ import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
 // ✅ Load API base URL from environment variable
 const API_URL = process.env.REACT_APP_API_URL;
+if (!API_URL) {
+  throw new Error("❌ REACT_APP_API_URL is not defined. Backend connection required.");
+}
 
 const ProjectDetails = () => {
   const { id } = useParams();

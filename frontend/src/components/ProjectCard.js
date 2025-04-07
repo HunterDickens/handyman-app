@@ -15,6 +15,9 @@ import styles from "./projectCard.module.css";
 
 // ✅ Load API base URL from environment variable
 const API_URL = process.env.REACT_APP_API_URL;
+if (!API_URL) {
+  throw new Error("❌ REACT_APP_API_URL is not defined. Backend connection required.");
+}
 
 const ProjectCard = ({ list, setProjects }) => {
   const navigate = useNavigate();
