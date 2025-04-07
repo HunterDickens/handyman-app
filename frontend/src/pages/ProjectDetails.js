@@ -20,6 +20,12 @@ import CheckboxList from "../components/CheckBoxList";
 import styles from "./ProjectDetails.module.css";
 import CreateProjectButton from "../components/CreateProjectButton";
 
+// ✅ Require backend URL to be defined in .env
+const API_URL = process.env.REACT_APP_API_URL;
+if (!API_URL) {
+  throw new Error("❌ REACT_APP_API_URL is not defined. Backend connection required.");
+}
+
 const ProjectDetails = () => {
   const { user, loading, logout } = useAuth();
   const { id } = useParams();
@@ -38,7 +44,7 @@ const ProjectDetails = () => {
         const idToken = await user.getIdToken();
 
         const response = await axios.get(
-          `http://localhost:5000/api/projects/${id}`,
+          `${API_URL}/api/projects/${id}`,
           {
             headers: { Authorization: `Bearer ${idToken}` },
           }
@@ -93,7 +99,7 @@ const ProjectDetails = () => {
       try {
         const idToken = await user.getIdToken();
         const response = await axios.get(
-          `http://localhost:5000/api/projects/${id}`,
+          `${API_URL}/api/projects/${id}`,
           {
             headers: { Authorization: `Bearer ${idToken}` },
           }
@@ -126,7 +132,7 @@ const ProjectDetails = () => {
               ) : (
                 <UploadImage
                   targetId={id}
-                  uploadEndpoint={`http://localhost:5000/api/uploads/projects/${id}/upload`}
+                  uploadEndpoint={`${API_URL}/api/uploads/projects/${id}/upload`}
                   onUploadSuccess={handleProjectImageUpload}
                   existingImages={project?.images}
                   customTrigger={
@@ -145,7 +151,7 @@ const ProjectDetails = () => {
               {project?.images?.length > 0 && (
                 <UploadImage
                   targetId={id}
-                  uploadEndpoint={`http://localhost:5000/api/uploads/projects/${id}/upload`}
+                  uploadEndpoint={`${API_URL}/api/uploads/projects/${id}/upload`}
                   onUploadSuccess={handleProjectImageUpload}
                   existingImages={project?.images}
                   buttonText="Add More Images"
@@ -199,7 +205,7 @@ const ProjectDetails = () => {
                       )}
                     <UploadImage
                       targetId={sp?.id}
-                      uploadEndpoint={`http://localhost:5000/api/uploads/projects/${id}/subprojects/${sp.id}/upload`}
+                      uploadEndpoint={`${API_URL}/api/uploads/projects/${id}/subprojects/${sp.id}/upload`}
                       onUploadSuccess={(imageUrl) =>
                         handleSubprojectImageUpload(sp.id, imageUrl)
                       }
