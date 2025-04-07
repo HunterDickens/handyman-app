@@ -4,7 +4,10 @@ import { useAuth } from "../authContext/authContext";
 import axios from "axios";
 import ProjectTabs from "../components/projectsTabs";
 import CreateProjectButton from "../components/CreateProjectButton";
-import "./Dashboard.css"; // Import the CSS styles
+import "./Dashboard.css";
+
+// ✅ Load API base URL from environment variable
+const API_URL = process.env.REACT_APP_API_URL;
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -15,40 +18,9 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchProjects = async () => {
-      if (user) {
-        try {
-          const idToken = await user.getIdToken();
-          const response = await axios.get(
-            "http://localhost:5000/api/projects",
-            {
-              headers: { Authorization: `Bearer ${idToken}` },
-            }
-          );
-          setProjects(response.data.projects);
-        } catch (error) {
-          console.error("Error fetching projects:", error);
-          setError("Failed to load projects.");
-        }
-      }
-    };
-
-    if (user) {
-      fetchProjects();
-    } else {
-      navigate("/login");
-    }
-  }, [user, navigate]);
-
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
-
-  const refreshProjects = async () => {
-    if (user) {
       try {
-        const idToken = await user.getIdToken();
-        const response = await axios.get("http://localhost:5000/api/projects", {
+        const idToken = await user?.getIdToken();
+        const response = await axios.get(`${API_URL}/api/projects`, {
           headers: { Authorization: `Bearer ${idToken}` },
         });
         setProjects(response.data.projects);
@@ -56,6 +28,30 @@ const Dashboard = () => {
         console.error("Error fetching projects:", error);
         setError("Failed to load projects.");
       }
+    };
+
+    if (user) {
+      fetchProjects();
+    } else if (!loading) {
+      navigate("/login");
+    }
+  }, [user, loading, navigate]);
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/login");
+  };
+
+  const refreshProjects = async () => {
+    try {
+      const idToken = await user?.getIdToken();
+      const response = await axios.get(`${API_URL}/api/projects`, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
+      setProjects(response.data.projects);
+    } catch (error) {
+      console.error("Error refreshing projects:", error);
+      setError("Failed to refresh projects.");
     }
   };
 

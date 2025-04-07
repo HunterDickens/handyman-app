@@ -5,6 +5,10 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import styles from "./Login.module.css";
 
+// loading the api base URL from .env file
+const API_URL = process.env.REACT_APP_API_URL;
+
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -30,7 +34,7 @@ const Login = () => {
       console.log("✅ Firebase Auth User Logged In:", user);
 
       const response = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        "${API_URL}/api/auth/login",
         { email, password },
         {
           headers: {

@@ -3,7 +3,13 @@ import { auth } from "../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "./Signup.css"; 
+import "./Signup.css";
+
+// ✅ Require backend URL to be defined in .env
+const API_URL = process.env.REACT_APP_API_URL;
+if (!API_URL) {
+  throw new Error("❌ REACT_APP_API_URL is not defined. Backend connection required.");
+}
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -18,35 +24,39 @@ const Signup = () => {
     e.preventDefault();
     setError("");
     setLoading(true);
-  
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       const idToken = await user.getIdToken();
-  
+
       await axios.post(
-        "http://localhost:5000/api/auth/signup",
+        `${API_URL}/api/auth/signup`,
         { email, password, name },
-        { headers: { Authorization: `Bearer ${idToken}`, "Content-Type": "application/json" } }
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+            "Content-Type": "application/json"
+          }
+        }
       );
-  
+
       alert("Sign up successful! Please log in.");
       navigate("/login");
     } catch (err) {
       console.error("Signup Error:", err);
-      setError(err.message || "Failed to sign up. Try again.");
+      setError(err.response?.data?.error || err.message || "Failed to sign up. Try again.");
     } finally {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="signup-container">
       <div className="signup-box">
-        {/* Left Side: Branding Section */}
         <div className="signup-left">
           <h2>Handyman</h2>
-          <p> DIY at you finger tips.</p>
+          <p>DIY at your fingertips.</p>
           <ul>
             <li>✔ Reliable Advice</li>
             <li>✔ Verified Professionals</li>
@@ -54,7 +64,6 @@ const Signup = () => {
           </ul>
         </div>
 
-        {/* Right Side: Signup Form */}
         <div className="signup-right">
           <h2>Sign Up</h2>
           {error && <p className="error-message">{error}</p>}
