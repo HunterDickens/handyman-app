@@ -5,6 +5,12 @@ import { auth } from "../firebase";
 import { Button, Spinner, Alert, ListGroup, Image } from "react-bootstrap";
 import AddPhotoAlternateIcon from '@mui/icons-material/AddPhotoAlternate';
 
+// ✅ Load API base URL from environment variable
+const API_URL = process.env.REACT_APP_API_URL;
+if (!API_URL) {
+  throw new Error("❌ REACT_APP_API_URL is not defined. Backend connection required.");
+}
+
 const ProjectDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -20,7 +26,7 @@ const ProjectDetails = () => {
         const idToken = await user.getIdToken();
 
         console.log(`📡 Fetching project: /api/projects/${id}`);
-        const response = await axios.get(`http://localhost:5000/api/projects/${id}`, {
+        const response = await axios.get(`${API_URL}/api/projects/${id}`, {
           headers: { Authorization: `Bearer ${idToken}` },
         });
 

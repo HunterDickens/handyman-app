@@ -4,6 +4,12 @@ import axios from "axios";
 import { auth } from "../firebase";
 import { Form, Button, Modal } from "react-bootstrap";
 
+// ✅ Require backend URL to be defined in .env
+const API_URL = process.env.REACT_APP_API_URL;
+if (!API_URL) {
+  throw new Error("❌ REACT_APP_API_URL is not defined. Backend connection required.");
+}
+
 const Projects = () => {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
@@ -29,7 +35,7 @@ const Projects = () => {
         if (!user) return;
         const idToken = await user.getIdToken();
 
-        const response = await axios.get("http://localhost:5000/api/projects", {
+        const response = await axios.get(`${API_URL}/api/projects`, {
           headers: { Authorization: `Bearer ${idToken}` },
         });
 
@@ -70,7 +76,7 @@ const Projects = () => {
       };
 
       const response = await axios.post(
-        "http://localhost:5000/api/projects",
+        `${API_URL}/api/projects`,
         newProjectData,
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
@@ -107,7 +113,7 @@ const Projects = () => {
       const idToken = await user.getIdToken();
 
       await axios.patch(
-        `http://localhost:5000/api/projects/${selectedProject.id}`,
+        `${API_URL}/api/projects/${selectedProject.id}`,
         { status },
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
@@ -129,7 +135,7 @@ const Projects = () => {
       if (!user) return;
       const idToken = await user.getIdToken();
 
-      await axios.delete(`http://localhost:5000/api/projects/${projectId}`, {
+      await axios.delete(`${API_URL}/api/projects/${projectId}`, {
         headers: { Authorization: `Bearer ${idToken}` },
       });
 
