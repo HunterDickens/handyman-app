@@ -1,0 +1,8 @@
+.box {
+  background-color: var(--secondary-color);
+  height: 100vh;
+  color: var(--primary-text);
+}
+.icon {
+  color: var(--primary-text);
+}

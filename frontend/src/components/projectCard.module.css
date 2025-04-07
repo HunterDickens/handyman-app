@@ -12,6 +12,8 @@
 
 .project-box :global .MuiCard-root {
   background-color: var(--primary-blue);
+  height: 270px;
+  width: 180px;
 }
 .project-box :global .MuiCard-root:hover {
   background-color: var(--secondary-blue);

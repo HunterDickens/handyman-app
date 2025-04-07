@@ -1,55 +1,78 @@
-// routes/repairInstructionsRoutes.js
 const express = require("express");
-const { OpenAI } = require("openai"); // Import OpenAI
+const multer = require("multer");
+const fs = require("fs");
+const { OpenAI } = require("openai");
 require("dotenv").config();
 
 const router = express.Router();
+const upload = multer({ dest: "uploads/" }); // Temp upload dir
 
 // Initialize OpenAI
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY, // API Key from .env
+  apiKey: process.env.OPENAI_API_KEY,
 });
 
-// Endpoint for generating repair instructions
-router.post("/generate-instructions", async (req, res) => {
-  try {
-    console.log("Request received:", req.body); // Log request body
+// POST /repair/generate-instructions
+router.post(
+  "/generate-instructions",
+  upload.single("image"),
+  async (req, res) => {
+    try {
+      const { detectedIssues } = req.body;
+      const imageFile = req.file;
 
-    const { detectedIssues, imageUrl } = req.body;
+      if (!detectedIssues || !imageFile) {
+        return res
+          .status(400)
+          .json({ error: "Image or detected issues missing." });
+      }
 
-    if (!detectedIssues || !imageUrl) {
-      console.error("Missing required fields");
-      return res.status(400).json({ error: "Detected issues or image URL is missing" });
+      // Convert image to base64
+      const imagePath = imageFile.path;
+      const base64Image = fs.readFileSync(imagePath, { encoding: "base64" });
+
+      // Construct prompt
+      const prompt = `You are a home repair expert. A user uploaded an image of a household issue with the following problems: ${detectedIssues}.
+Identify the problem in the image, and provide a detailed, step-by-step repair guide including tools and materials needed. Be clear and beginner-friendly.`;
+
+      console.log("Sending request to OpenAI...");
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4-vision-preview",
+        messages: [
+          {
+            role: "user",
+            content: [
+              { type: "text", text: prompt },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:image/jpeg;base64,${base64Image}`,
+                },
+              },
+            ],
+          },
+        ],
+        max_tokens: 1000,
+      });
+
+      fs.unlinkSync(imagePath); // Clean up uploaded file
+
+      if (!response.choices || response.choices.length === 0) {
+        return res.status(500).json({ error: "No response from OpenAI." });
+      }
+
+      const repairInstructions = response.choices[0].message.content.trim();
+
+      res.json({
+        message: "Repair instructions generated successfully",
+        repairInstructions,
+      });
+    } catch (error) {
+      console.error("Error generating repair instructions:", error);
+      res.status(500).json({ error: "Failed to generate instructions" });
     }
-
-    console.log("Sending request to OpenAI...");
-
-    const prompt = `Generate step-by-step repair instructions for fixing a ${detectedIssues.join(", ")}. The user uploaded an image of the problem here: ${imageUrl}. Provide detailed instructions including required tools and materials.`;
-
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-    });
-
-    console.log("OpenAI response received");
-
-    if (!response.choices || response.choices.length === 0) {
-      console.error("Invalid response from OpenAI");
-      return res.status(500).json({ error: "Failed to generate instructions" });
-    }
-
-    const repairInstructions = response.choices[0].message.content.trim();
-    console.log("Repair instructions generated:", repairInstructions);
-
-    res.json({
-      message: "Repair instructions generated successfully",
-      repairInstructions,
-    });
-  } catch (error) {
-    console.error("Error generating repair instructions:", error);
-    res.status(500).json({ error: "Failed to generate instructions" });
   }
-});
-
+);
 
 module.exports = router;

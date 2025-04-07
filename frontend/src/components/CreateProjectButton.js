@@ -1,28 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@mui/material";
 import CreateProjectModal from "./createProjectModal";
 
 const CreateProjectButton = ({
-  isOpen,
-  onOpen,
-  onClose,
   title,
   onProjectCreated,
-  
   projectId,
+  variant = "contained",
+  color = "primary",
+  card,
 }) => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOpen = () => setIsOpen(true);
+  const handleClose = () => setIsOpen(false);
+
   return (
     <>
-      <Button variant="contained" color="primary" onClick={onOpen}>
-        {title}
-      </Button>
+      {card ? (
+        <div></div>
+      ) : (
+        <Button variant={variant} color={color} onClick={handleOpen}>
+          {title}
+        </Button>
+      )}
 
       <CreateProjectModal
         open={isOpen}
-        onClose={onClose}
+        onClose={handleClose}
         title={title}
-        onProjectCreated={onProjectCreated}
-       
+        onProjectCreated={() => {
+          onProjectCreated?.();
+          handleClose();
+        }}
         projectId={projectId}
       />
     </>

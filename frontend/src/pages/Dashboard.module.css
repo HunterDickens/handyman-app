@@ -1,10 +1,11 @@
 /* Outer container: dark background, full height */
+
 .dashboard-container {
   background-color: var(--primary-color); /* Dark navy */
-  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100vh;
 }
 
 /* Main card: now wider (90% up to 1200px) */
@@ -65,4 +66,8 @@
 .projects-heading {
   font-size: 20px;
   margin-top: 30px;
+}
+.iconContainer {
+ 
+  position: absolute;
 }

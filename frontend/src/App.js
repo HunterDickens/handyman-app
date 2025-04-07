@@ -5,7 +5,9 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
 import Projects from "./pages/Projects";
+import Profile from "./pages/Profile";
 import ProjectDetails from "./pages/ProjectDetails";
+import Assistant from "./pages/Assistant";
 import "./global.css";
 
 const App = () => {
@@ -18,6 +20,8 @@ const App = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/projects" element={<Projects />} />
         <Route path="/projects/:id" element={<ProjectDetails />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/assistant" element={<Assistant />} />
       </Routes>
     </Router>
   );

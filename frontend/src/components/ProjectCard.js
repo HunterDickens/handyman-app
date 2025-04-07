@@ -93,27 +93,28 @@ const ProjectCard = ({ list, setProjects }) => {
     setProjectToDelete(null);
   };
 
+
+
   return (
     <>
       {list.map((project) => (
         <div className={styles["project-box"]}>
           <Card
             key={project.id}
-            sx={{ maxWidth: 345 }}
+            sx={{ maxWidth: 345}}
             onClick={() => navigate(`/projects/${project.id}`)}
           >
             <CardMedia
-              sx={{ height: 100 }}
-              // image="/static/images/cards/contemplative-reptile.jpg"
+              sx={{ height: 140 }}
+              image={project?.images?.[0]}
               title={project.title}
             />
 
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">
-                {project.title}
-              </Typography>
-              <Typography variant="body2" className={styles.secondary}>
-                {project.description}
+                {project.title.length > 10
+                  ? `${project.title.substring(0, 10)}...`
+                  : project.title}
               </Typography>
             </CardContent>
             <CardActions onClick={(e) => e.stopPropagation()}>

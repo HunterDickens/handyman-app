@@ -4,13 +4,14 @@ import { useAuth } from "../authContext/authContext";
 import axios from "axios";
 import ProjectTabs from "../components/projectsTabs";
 import CreateProjectButton from "../components/CreateProjectButton";
-import "./Dashboard.css"; // Import the CSS styles
+import SideBar from "../components/SideBar";
+
+import styles from "./Dashboard.module.css";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { user, loading, logout } = useAuth();
   const [projects, setProjects] = useState([]);
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -39,11 +40,6 @@ const Dashboard = () => {
     }
   }, [user, navigate]);
 
-  const handleLogout = async () => {
-    await logout();
-    navigate("/login");
-  };
-
   const refreshProjects = async () => {
     if (user) {
       try {
@@ -60,40 +56,34 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="dashboard-container">
-      <div className="dashboard-card">
-        <div className="dashboard-header">
-          <div className="menu-icon">≡</div>
-          <h2 className="dashboard-title">Welcome, {user?.email || "User"}</h2>
-          <p className="dashboard-subtitle">
+    <div className={styles["dashboard-container"]}>
+      <div className={styles["dashboard-card"]}>
+        <div className={styles["dashboard-header"]}>
+          <div className={styles.iconContainer}>
+            <SideBar />
+          </div>
+          <h2 className={styles["dashboard-title"]}>
+            Welcome, {user?.email || "User"}
+          </h2>
+          <p className={styles["dashboard-subtitle"]}>
             Here's a quick look at your projects
           </p>
         </div>
-
         {loading ? (
-          <p className="text-center">Loading user data...</p>
+          <p className={styles["text-center"]}>Loading user data...</p>
         ) : user ? (
-          <p className="text-center">
+          <p className={styles["text-center"]}>
             Logged in as: <strong>{user.email}</strong>
           </p>
         ) : (
-          <p className="text-center text-danger">Error fetching user data</p>
+          <p className={styles["text-center text-danger"]}>
+            Error fetching user data
+          </p>
         )}
-
-        <div className="dashboard-buttons">
-          <button className="btn-logout" onClick={handleLogout}>
-            Logout
-          </button>
-        </div>
-
         <div className="mt-4 d-flex justify-content-center">
           <CreateProjectButton
-            isOpen={isCreateModalOpen}
-            onOpen={() => setIsCreateModalOpen(true)}
-            onClose={() => setIsCreateModalOpen(false)}
             onProjectCreated={refreshProjects}
-            title={"+ New Project"}
-            mode="project"
+            title="+ New Project"
           />
         </div>
 

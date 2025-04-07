@@ -25,11 +25,9 @@
   flex-wrap: wrap;
   gap: 20px;
   justify-content: center;
-  margin-top: 20px;
   overflow: auto;
   max-height: 300px;
   padding: 16px;
-  margin: 8px -16px;
 }
 
 /* Webkit scrollbar styles */
