@@ -25,7 +25,7 @@ const RepairInstructionForm = () => {
 
     const formData = new FormData();
     formData.append("image", image);
-    formData.append("detectedIssues", detectedIssues.join(", "));
+    formData.append("detectedIssues", JSON.stringify(detectedIssues));
 
     setLoading(true);
     try {
