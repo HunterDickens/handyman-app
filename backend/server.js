@@ -10,14 +10,15 @@ const costEstimationRoutes = require("./routes/costEstimationRoutes");
 
 const app = express();
 
-// ✅ Allowlist for frontend domains
 const allowedOrigins = [
   "https://on-handyman.com",
   "https://www.on-handyman.com",
   "https://handymanapp-b6e50.web.app",
   "https://handymanapp-b6e50.firebaseapp.com",
-  "https://localhost:5000"
+  "https://localhost:5000", // ← this is your backend, not frontend
+  "http://localhost:3000"   // ✅ this is the correct frontend dev origin
 ];
+
 
 // ✅ Manual CORS configuration
 app.use((req, res, next) => {
