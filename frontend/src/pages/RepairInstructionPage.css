@@ -1,0 +1,105 @@
+/* Container to center the card, like the Dashboard */
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  background-color: #121212;
+  padding: 40px 20px;
+}
+
+/* Card style consistent with dashboard */
+.dashboard-card {
+  width: 100%;
+  max-width: 800px;
+  background-color: #1f1f2e;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  color: #f0f0f0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.dashboard-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #ffffff;
+}
+
+/* Form styles */
+.repair-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.repair-form label {
+  font-weight: 600;
+  font-size: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.repair-form input[type="file"],
+.repair-form input[type="text"] {
+  padding: 10px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  background-color: #2c2c3c;
+  color: #ffffff;
+}
+
+/* Submit button */
+.repair-form button {
+  padding: 12px;
+  background-color: #3478f6;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.repair-form button:disabled {
+  background-color: #5d7cb0;
+  cursor: not-allowed;
+}
+
+/* Uploaded image preview */
+.preview-image {
+  max-width: 100%;
+  max-height: 250px;
+  border-radius: 10px;
+  object-fit: contain;
+  border: 1px solid #444;
+  margin-top: 10px;
+}
+
+/* Output block for instructions */
+.instructions-output {
+  margin-top: 24px;
+  background-color: #29293a;
+  padding: 20px;
+  border-radius: 12px;
+  white-space: pre-wrap;
+  color: #ffffff;
+}
+
+.instructions-output h3 {
+  margin-bottom: 12px;
+  font-size: 20px;
+  color: #4eaaff;
+}
+
+.error-text {
+  color: #ff5a5f;
+  font-weight: bold;
+  text-align: center;
+}

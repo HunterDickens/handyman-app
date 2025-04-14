@@ -34,7 +34,7 @@ const Login = () => {
       console.log("✅ Firebase Auth User Logged In:", user);
 
       const response = await axios.post(
-        "${API_URL}/api/auth/login",
+        `${API_URL}/api/auth/login`,
         { email, password },
         {
           headers: {

@@ -35,9 +35,10 @@ const Projects = () => {
         if (!user) return;
         const idToken = await user.getIdToken();
 
-        const response = await axios.get("${API_URL}/api/projects", {
+        const response = await axios.get(`${API_URL}/api/projects`, {
           headers: { Authorization: `Bearer ${idToken}` },
         });
+        
 
         setProjects(response.data.projects);
       } catch (err) {
@@ -76,7 +77,7 @@ const Projects = () => {
       };
 
       const response = await axios.post(
-        "${API_URL}/api/projects",
+        `{API_URL}/api/projects`,
         newProjectData,
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
