@@ -96,6 +96,15 @@ const Dashboard = () => {
           />
         </div>
 
+        <div className="mt-4 d-flex justify-content-center">
+          <button 
+            className="mt-4 d-flex justify-content-center" 
+            onClick={() => navigate("/public-dashboard")
+            }>
+              Public Projects
+          </button>
+        </div>
+
         {error && <p className="text-danger text-center">{error}</p>}
 
         <h3 className="projects-heading">Repair Projects</h3>
