@@ -18,7 +18,7 @@ html, body, #root {
 
 /* Container to center the card, like the Dashboard */
 .dashboard-container {
-  min-height: 100dvh; /* ✅ 'dynamic viewport height' = better scrolling */
+  min-height: 100dvh; /*'dynamic viewport height' = better scrolling */
   padding-top: 20px;  /* Optional: adds breathing room at top */
   width: 100%;
   background-color: #0f0f1a;
