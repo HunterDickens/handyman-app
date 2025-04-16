@@ -42,7 +42,7 @@ function RepairInstructionPage() {
 
       const response = await axios.post("http://localhost:5000/api/repair/generate-instructions", {
         detectedIssues: issuesArray,
-        imageUrl,
+        imageUrl: imageUrl || "",
       });
 
       setInstructions(response.data.repairInstructions);
@@ -73,7 +73,6 @@ function RepairInstructionPage() {
             type: "file",
             accept: "image/*",
             onChange: handleImageChange,
-            required: true,
           })
         ),
   

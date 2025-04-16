@@ -24,7 +24,7 @@ app.use(morgan("dev"));
 app.use("/api/auth", authRoutes);
 app.use("/api/projects", projectRoutes);  // ✅ Projects routes
 app.use("/api/uploads", uploadRoutes);    // ✅ Uploads for images only
-app.use("/api", generateInstructionsRoutes);
+app.use("/api/repair", generateInstructionsRoutes);
 app.use("/api/cost", costEstimationRoutes);
 
 // ✅ Test Route
