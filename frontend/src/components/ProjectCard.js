@@ -13,6 +13,12 @@ import Button from "@mui/material/Button";
 
 import styles from "./projectCard.module.css";
 
+// ✅ Load API base URL from environment variable
+const API_URL = process.env.REACT_APP_API_URL;
+if (!API_URL) {
+  throw new Error("❌ REACT_APP_API_URL is not defined. Backend connection required.");
+}
+
 const ProjectCard = ({ list, setProjects }) => {
   const navigate = useNavigate();
   const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
@@ -36,7 +42,7 @@ const ProjectCard = ({ list, setProjects }) => {
       };
 
       const response = await axios.patch(
-        `http://localhost:5000/api/projects/${updatedProject.id}`,
+        `${API_URL}/api/projects/${updatedProject.id}`,
         payload,
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
@@ -70,7 +76,7 @@ const ProjectCard = ({ list, setProjects }) => {
       const idToken = await user.getIdToken();
 
       await axios.delete(
-        `http://localhost:5000/api/projects/${projectToDelete.id}`,
+        `${API_URL}/api/projects/${projectToDelete.id}`,
         { headers: { Authorization: `Bearer ${idToken}` } }
       );
 

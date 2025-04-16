@@ -77,7 +77,7 @@ const Projects = () => {
       };
 
       const response = await axios.post(
-        `{API_URL}/api/projects`,
+        `${API_URL}/api/projects`,
         newProjectData,
         { headers: { Authorization: `Bearer ${idToken}` } }
       );

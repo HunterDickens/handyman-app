@@ -7,6 +7,12 @@ import axios from "axios";
 import { auth } from "../firebase";
 import styles from "./projectsTabs.module.css";
 
+// ✅ Load API base URL from environment variable
+const API_URL = process.env.REACT_APP_API_URL;
+if (!API_URL) {
+  throw new Error("❌ REACT_APP_API_URL is not defined. Backend connection required.");
+}
+
 const ProjectTabs = ({ projectsData }) => {
   // <-- Fix here, correctly destructure
   const [value, setValue] = useState("1");
@@ -19,7 +25,7 @@ const ProjectTabs = ({ projectsData }) => {
         if (!user) return;
         const idToken = await user.getIdToken();
 
-        const response = await axios.get("http://localhost:5000/api/projects", {
+        const response = await axios.get(`${API_URL}/api/projects`, {
           headers: { Authorization: `Bearer ${idToken}` },
         });
 
