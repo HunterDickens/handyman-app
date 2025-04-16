@@ -1,12 +1,33 @@
+/*prevents the white at the bottom of the screen*/
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #0f0f1a; /* dark background */
+  color: #f0f0f0;
+  font-family: 'Segoe UI', sans-serif;
+  overflow-x: hidden;  /* Prevents horizontal scroll */
+}
+
+.instructions-output pre {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-x: auto;
+  background-color: inherit; /* match parent */
+}
+
 /* Container to center the card, like the Dashboard */
 .dashboard-container {
+  min-height: 100dvh; /* ✅ 'dynamic viewport height' = better scrolling */
+  padding-top: 20px;  /* Optional: adds breathing room at top */
+  width: 100%;
+  background-color: #0f0f1a;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
-  min-height: 100vh;
-  background-color: #121212;
   padding: 40px 20px;
+  box-sizing: border-box;
 }
+
 
 /* Card style consistent with dashboard */
 .dashboard-card {
