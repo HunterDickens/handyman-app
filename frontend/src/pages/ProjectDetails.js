@@ -266,9 +266,15 @@ const ProjectDetails = () => {
       <Button className="mt-3" onClick={() => navigate("/dashboard")}>
         Back to Dashboard
       </Button>
-      <Button className="mt-3" variant={project.visibility === "public" ? "danger" : "success"} onClick={toggleVisibility}>
+      {project && (<Button 
+        className="mt-3" 
+        variant={project.visibility === "public" ? "danger" : "success"} 
+        onClick={toggleVisibility}
+      >
       {project.visibility === "public" ? "Make Private" : "Make Public"}
       </Button>
+      )}
+      
     </div>
   );
 };
