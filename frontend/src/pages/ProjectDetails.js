@@ -119,6 +119,30 @@ const ProjectDetails = () => {
     }
   };
 
+  const toggleVisibility = async () => {
+    try {
+      const idToken = await auth.currentUser.getIdToken();
+      const newVisibility = project.visibility === "public" ? "private" : "public";
+
+      await axios.patch(
+        `${API_URL}/api/projects/${id}`,
+        { visibility: newVisibility },
+        {
+          headers: { Authorization: `Bearer ${idToken}` },
+        }
+      );
+
+      setProject((prevProject) => ({
+        ...prevProject,
+        visibility: newVisibility,
+      }));
+    } catch (error) {
+      console.error("Error toggling visibility:", error);
+      setError("Failed to update project visibility.");
+    }
+  };
+
+
   return (
     <div className={`container-fluid pt-5 ps-5 pe-5 ${styles.body}`}>
       {error && <Alert variant="danger">{error}</Alert>}
@@ -175,6 +199,7 @@ const ProjectDetails = () => {
                 showIcons={true}
                 // TO-DO: change material structure to object so it can store entries and their state (checked or not)
               />
+              
             )}
             <h4 className="mt-4">Subprojects:</h4>
             {subprojects?.length > 0 ? (
@@ -240,6 +265,9 @@ const ProjectDetails = () => {
       </Row>
       <Button className="mt-3" onClick={() => navigate("/dashboard")}>
         Back to Dashboard
+      </Button>
+      <Button className="mt-3" variant={project.visibility === "public" ? "danger" : "success"} onClick={toggleVisibility}>
+      {project.visibility === "public" ? "Make Private" : "Make Public"}
       </Button>
     </div>
   );
