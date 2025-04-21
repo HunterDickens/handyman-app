@@ -16,7 +16,9 @@ import styles from "./projectCard.module.css";
 // ✅ Load API base URL from environment variable
 const API_URL = process.env.REACT_APP_API_URL;
 if (!API_URL) {
-  throw new Error("❌ REACT_APP_API_URL is not defined. Backend connection required.");
+  throw new Error(
+    "❌ REACT_APP_API_URL is not defined. Backend connection required."
+  );
 }
 
 const ProjectCard = ({ list, setProjects }) => {
@@ -75,10 +77,9 @@ const ProjectCard = ({ list, setProjects }) => {
       if (!user) return;
       const idToken = await user.getIdToken();
 
-      await axios.delete(
-        `${API_URL}/api/projects/${projectToDelete.id}`,
-        { headers: { Authorization: `Bearer ${idToken}` } }
-      );
+      await axios.delete(`${API_URL}/api/projects/${projectToDelete.id}`, {
+        headers: { Authorization: `Bearer ${idToken}` },
+      });
 
       // Remove the deleted project from the local state
       setProjects((prev) => prev.filter((p) => p.id !== projectToDelete.id));
@@ -116,7 +117,9 @@ const ProjectCard = ({ list, setProjects }) => {
 
             <CardContent>
               <Typography gutterBottom variant="h5" component="div">
-                {project.title}
+                {project.title.length > 10
+                  ? `${project.title.substring(0, 10)}...`
+                  : project.title}
               </Typography>
               <Typography variant="body2" className={styles.secondary}>
                 {project.description}
