@@ -10,6 +10,7 @@ import { Typography } from "@mui/material";
 import EditProjectModal from "./editProjectModal";
 import ConfirmationModal from "./confirmationModal"; // Import the new modal
 import Button from "@mui/material/Button";
+import HandymanIcon from "@mui/icons-material/Handyman";
 
 import styles from "./projectCard.module.css";
 
@@ -111,7 +112,7 @@ const ProjectCard = ({ list, setProjects }) => {
           >
             <CardMedia
               sx={{ height: 100 }}
-              // image="/static/images/cards/contemplative-reptile.jpg"
+              children={<HandymanIcon sx={{ "font-size": 100 }} />}
               title={project.title}
             />
 
