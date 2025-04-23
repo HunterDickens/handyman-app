@@ -1,15 +1,29 @@
-import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import "./RepairInstructionPage.css";
 
-
 function RepairInstructionPage() {
+  const { projectId } = useParams(); //  useParams moved inside the component
+  const navigate = useNavigate();    //  useNavigate moved inside the component
+
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [detectedIssues, setDetectedIssues] = useState("");
   const [instructions, setInstructions] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchProject = async () => {
+      const res = await axios.get(`http://localhost:5000/api/projects/${projectId}`);
+      const project = res.data.project;
+      setDetectedIssues(project.description);
+      setImageUrl(project.imageUrl);
+    };
+
+    fetchProject();
+  }, [projectId]); //  useEffect moved inside the component
 
   const mockUploadImage = async (file) => {
     return new Promise((resolve) => {
@@ -60,8 +74,15 @@ function RepairInstructionPage() {
     React.createElement(
       "div",
       { className: "dashboard-card" },
+
+      //  Back Buttons
+      React.createElement("div", { className: "button-row" },
+        React.createElement("button", { onClick: () => navigate("/dashboard") }, "← Back to Dashboard"),
+        React.createElement("button", { onClick: () => navigate("/projects") }, "← Back to Projects")
+      ),
+
       React.createElement("h2", { className: "dashboard-title" }, "Upload Damage Image & Get Repair Instructions"),
-  
+
       React.createElement(
         "form",
         { onSubmit: handleSubmit, className: "repair-form" },
@@ -75,14 +96,14 @@ function RepairInstructionPage() {
             onChange: handleImageChange,
           })
         ),
-  
+
         imageUrl &&
           React.createElement("img", {
             src: imageUrl,
             alt: "Preview",
             className: "preview-image",
           }),
-  
+
         React.createElement(
           "label",
           null,
@@ -95,16 +116,16 @@ function RepairInstructionPage() {
             required: true,
           })
         ),
-  
+
         React.createElement(
           "button",
           { type: "submit", disabled: loading },
           loading ? "Generating..." : "Generate Instructions"
         )
       ),
-  
+
       error && React.createElement("p", { className: "error-text" }, error),
-  
+
       instructions &&
         React.createElement(
           "div",
@@ -114,8 +135,6 @@ function RepairInstructionPage() {
         )
     )
   );
-  
 }
 
 export default RepairInstructionPage;
-

@@ -20,6 +20,7 @@ const App = () => {
         <Route path="/projects" element={<Projects />} />
         <Route path="/projects/:id" element={<ProjectDetails />} />
         <Route path="/repair-instructions" element={<RepairInstructionPage />} />
+        <Route path="/repair-instructions/:projectId" element={<RepairInstructionPage />} />
       </Routes>
     </Router>
   );

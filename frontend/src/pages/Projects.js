@@ -4,7 +4,7 @@ import axios from "axios";
 import { auth } from "../firebase";
 import { Form, Button, Modal } from "react-bootstrap";
 
-// ✅ Require backend URL to be defined in .env
+//Require backend URL to be defined in .env
 const API_URL = process.env.REACT_APP_API_URL;
 if (!API_URL) {
   throw new Error("❌ REACT_APP_API_URL is not defined. Backend connection required.");
@@ -27,7 +27,6 @@ const Projects = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
 
-  // ✅ Fetch Projects when User is Authenticated
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -38,7 +37,6 @@ const Projects = () => {
         const response = await axios.get(`${API_URL}/api/projects`, {
           headers: { Authorization: `Bearer ${idToken}` },
         });
-        
 
         setProjects(response.data.projects);
       } catch (err) {
@@ -50,10 +48,8 @@ const Projects = () => {
     fetchProjects();
   }, []);
 
-  // ✅ Handle Input Change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
     if (name === "materials") {
       setNewProject({ ...newProject, [name]: value.split(",").map((m) => m.trim()) });
     } else {
@@ -61,7 +57,6 @@ const Projects = () => {
     }
   };
 
-  // ✅ Create New Project
   const handleCreateProject = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -100,13 +95,11 @@ const Projects = () => {
     }
   };
 
-  // ✅ Open Status Update Modal
   const handleOpenModal = (project) => {
     setSelectedProject(project);
     setShowModal(true);
   };
 
-  // ✅ Update Project Status
   const handleUpdateStatus = async (status) => {
     try {
       const user = auth.currentUser;
@@ -129,7 +122,6 @@ const Projects = () => {
     }
   };
 
-  // ✅ Delete Project
   const handleDeleteProject = async (projectId) => {
     try {
       const user = auth.currentUser;
@@ -152,12 +144,10 @@ const Projects = () => {
       <h2 className="text-center">Repair Projects</h2>
       {error && <p className="text-danger text-center">{error}</p>}
 
-      {/* ✅ Show Loading Message */}
       {loading ? (
         <p className="text-center">Loading projects...</p>
       ) : (
         <>
-          {/* ✅ New Project Form */}
           <Form onSubmit={handleCreateProject} className="mb-4">
             <Form.Group>
               <Form.Label>Title</Form.Label>
@@ -195,40 +185,39 @@ const Projects = () => {
             </Button>
           </Form>
 
-          {/* ✅ Project List */}
           <ul className="list-group">
             {projects.map((project) => (
-              <li 
-                key={project.id} 
+              <li
+                key={project.id}
                 className="list-group-item d-flex justify-content-between align-items-center"
-                onClick={() => navigate(`/projects/${project.id}`)}
                 style={{ cursor: "pointer" }}
               >
-                <div> 
+                <div>
                   <h5>{project.title}</h5>
                   <p>{project.description}</p>
                   <span className={`badge ${project.status === "completed" ? "bg-success" : "bg-warning"}`}>
                     {project.status}
                   </span>
                 </div>
-                <div>
-                  <Button variant="info" className="me-2" onClick={(e) => { e.stopPropagation(); handleOpenModal(project); }}>
+                <div className="d-flex flex-column gap-2">
+                  <Button variant="primary" onClick={() => navigate(`/repair-instructions/${project.id}`)}>
+                    View Instructions
+                  </Button>
+                  <Button variant="info" onClick={() => handleOpenModal(project)}>
                     Update Status
                   </Button>
-                  <Button variant="danger" onClick={(e) => { e.stopPropagation(); handleDeleteProject(project.id); }}>
+                  <Button variant="danger" onClick={() => handleDeleteProject(project.id)}>
                     Delete
                   </Button>
                 </div>
               </li>
             ))}
           </ul>
-          
-          {/* ✅ Back to Dashboard Button */}
-            <Button variant="secondary" className="mt-3" onClick={() => navigate("/dashboard")}>
-              Back to Dashboard
-            </Button>
 
-          {/* ✅ Status Update Modal */}
+          <Button variant="secondary" className="mt-3" onClick={() => navigate("/dashboard")}>
+            Back to Dashboard
+          </Button>
+
           <Modal show={showModal} onHide={() => setShowModal(false)}>
             <Modal.Header closeButton>
               <Modal.Title>Update Project Status</Modal.Title>
@@ -252,4 +241,3 @@ const Projects = () => {
 };
 
 export default Projects;
-
