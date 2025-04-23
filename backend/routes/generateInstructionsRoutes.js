@@ -86,9 +86,10 @@ router.post("/generate-instructions/:projectId", verifyFirebaseToken, async (req
     console.log("Sending request to OpenAI...");
 
     // Build the prompt with or without the image
-    const prompt = `Generate step-by-step repair instructions for fixing a ${detectedIssues.join(", ")}.${
-      imageUrl ? ` The user uploaded an image of the problem here: ${imageUrl}.` : ""
-    } Provide detailed instructions including required tools and materials.`;
+    const prompt = `Generate step-by-step repair instructions for the project titled "${projectData.title}". 
+    The project description is: "${projectData.description}". 
+    The materials provided are: ${projectData.materials.join(", ")}. 
+    Provide detailed instructions including required tools, materials, and steps.`;
     
 
     const response = await openai.chat.completions.create({
