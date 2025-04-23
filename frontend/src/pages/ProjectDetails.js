@@ -20,7 +20,7 @@ import CheckboxList from "../components/CheckBoxList";
 import styles from "./ProjectDetails.module.css";
 import CreateProjectButton from "../components/CreateProjectButton";
 
-// ✅ Require backend URL to be defined in .env
+// Require backend URL to be defined in .env
 const API_URL = process.env.REACT_APP_API_URL;
 if (!API_URL) {
   throw new Error("❌ REACT_APP_API_URL is not defined. Backend connection required.");
