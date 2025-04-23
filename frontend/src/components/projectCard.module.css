@@ -23,9 +23,8 @@
   justify-content: space-evenly;
 }
 
-.secondary{
-  color: rgba(255, 255, 255, 0.865) ;
-
+.secondary {
+  color: rgba(255, 255, 255, 0.865);
 }
 
 /* The "+" new project box */
@@ -40,4 +39,8 @@
 
 .new-project:hover {
   background-color: rgba(59, 130, 246, 0.1);
+}
+
+.project-box :global .MuiCardMedia-root {
+  padding: 10px;
 }
