@@ -1,15 +1,44 @@
-import React, { useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { auth } from "../firebase"; // Required for auth token
 import "./RepairInstructionPage.css";
 
-
 function RepairInstructionPage() {
+  const { projectId } = useParams();
+  const navigate = useNavigate();
+
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
   const [detectedIssues, setDetectedIssues] = useState("");
   const [instructions, setInstructions] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchProject = async () => {
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const idToken = await user.getIdToken();
+
+        const res = await axios.get(`http://localhost:5000/api/projects/${projectId}`, {
+          headers: {
+            Authorization: `Bearer ${idToken}`
+          }
+        });
+
+        const project = res.data.project;
+        setDetectedIssues(project.description);
+        setImageUrl(project.imageUrl);
+      } catch (err) {
+        console.error("Failed to fetch project:", err);
+        setError("Failed to load project.");
+      }
+    };
+
+    fetchProject();
+  }, [projectId]);
 
   const mockUploadImage = async (file) => {
     return new Promise((resolve) => {
@@ -60,8 +89,15 @@ function RepairInstructionPage() {
     React.createElement(
       "div",
       { className: "dashboard-card" },
+
+      // ✅ Modified Back Button
+      React.createElement("div", { className: "button-row" },
+        React.createElement("button", { onClick: () => navigate("/dashboard") }, "← Back to Dashboard"),
+        React.createElement("button", { onClick: () => navigate(`/projects/${projectId}`) }, "← Back to Project")
+      ),
+
       React.createElement("h2", { className: "dashboard-title" }, "Upload Damage Image & Get Repair Instructions"),
-  
+
       React.createElement(
         "form",
         { onSubmit: handleSubmit, className: "repair-form" },
@@ -75,14 +111,14 @@ function RepairInstructionPage() {
             onChange: handleImageChange,
           })
         ),
-  
+
         imageUrl &&
           React.createElement("img", {
             src: imageUrl,
             alt: "Preview",
             className: "preview-image",
           }),
-  
+
         React.createElement(
           "label",
           null,
@@ -95,16 +131,16 @@ function RepairInstructionPage() {
             required: true,
           })
         ),
-  
+
         React.createElement(
           "button",
           { type: "submit", disabled: loading },
           loading ? "Generating..." : "Generate Instructions"
         )
       ),
-  
+
       error && React.createElement("p", { className: "error-text" }, error),
-  
+
       instructions &&
         React.createElement(
           "div",
@@ -114,8 +150,6 @@ function RepairInstructionPage() {
         )
     )
   );
-  
 }
 
 export default RepairInstructionPage;
-

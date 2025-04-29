@@ -20,14 +20,14 @@ import CheckboxList from "../components/CheckBoxList";
 import styles from "./ProjectDetails.module.css";
 import CreateProjectButton from "../components/CreateProjectButton";
 
-// ✅ Require backend URL to be defined in .env
+// Require backend URL to be defined in .env
 const API_URL = process.env.REACT_APP_API_URL;
 if (!API_URL) {
   throw new Error("❌ REACT_APP_API_URL is not defined. Backend connection required.");
 }
 
 const ProjectDetails = () => {
-  const { user, loading, logout } = useAuth();
+  const { user, loading } = useAuth();
   const { id } = useParams();
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
@@ -43,15 +43,11 @@ const ProjectDetails = () => {
         if (!user) return;
         const idToken = await user.getIdToken();
 
-        const response = await axios.get(
-          `${API_URL}/api/projects/${id}`,
-          {
-            headers: { Authorization: `Bearer ${idToken}` },
-          }
-        );
+        const response = await axios.get(`${API_URL}/api/projects/${id}`, {
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
 
         setProject(response.data.project);
-        // Ensure all subprojects have an images array
         setSubprojects(
           response.data.project.subprojects?.map((sp) => ({
             ...sp,
@@ -90,22 +86,14 @@ const ProjectDetails = () => {
     );
   };
 
-  if (loading) {
-    return <Spinner animation="border" className="d-block mx-auto mt-5" />;
-  }
-
   const refreshProjects = async () => {
     if (user) {
       try {
         const idToken = await user.getIdToken();
-        const response = await axios.get(
-          `${API_URL}/api/projects/${id}`,
-          {
-            headers: { Authorization: `Bearer ${idToken}` },
-          }
-        );
+        const response = await axios.get(`${API_URL}/api/projects/${id}`, {
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
         setProject(response.data.project);
-        // Ensure all subprojects have an images array
         setSubprojects(
           response.data.project.subprojects?.map((sp) => ({
             ...sp,
@@ -119,11 +107,15 @@ const ProjectDetails = () => {
     }
   };
 
+  if (loading) {
+    return <Spinner animation="border" className="d-block mx-auto mt-5" />;
+  }
+
   return (
     <div className={`container-fluid pt-5 ps-5 pe-5 ${styles.body}`}>
       {error && <Alert variant="danger">{error}</Alert>}
       <Row>
-        <Col md={4} lg={3} className="border-end  border-2 pe-4">
+        <Col md={4} lg={3} className="border-end border-2 pe-4">
           <div className="sticky-top" style={{ top: "20px" }}>
             <h1 className={styles.projectTitle}>{project?.title}</h1>
             <div className="mb-3">
@@ -166,43 +158,39 @@ const ProjectDetails = () => {
           <div className="ps-md-4">
             <h3>Description</h3>
             <p>{project?.description}</p>
+
             <h3>Materials</h3>
             {project?.materials.length === 0 ? (
               <p>You don't need materials for this project</p>
             ) : (
-              <CheckboxList
-                items={project?.materials}
-                showIcons={true}
-                // TO-DO: change material structure to object so it can store entries and their state (checked or not)
-              />
+              <CheckboxList items={project?.materials} showIcons={true} />
             )}
+
             <h4 className="mt-4">Subprojects:</h4>
             {subprojects?.length > 0 ? (
               <ListGroup className="mb-3">
-                {subprojects?.map((sp) => (
+                {subprojects.map((sp) => (
                   <ListGroup.Item
                     key={sp.id}
                     className="d-flex flex-column mb-3"
                   >
                     <h6>{sp?.title}</h6>
                     <p>{sp?.description}</p>
-                    {sp?.images &&
-                      Array.isArray(sp.images) &&
-                      sp.images.length > 0 && (
-                        <div className="mb-2">
-                          {sp.images.map((img, i) => (
-                            <Image
-                              key={i}
-                              src={img}
-                              alt={`Subproject ${i}`}
-                              fluid
-                              rounded
-                              className="m-1"
-                              style={{ maxWidth: "150px" }}
-                            />
-                          ))}
-                        </div>
-                      )}
+                    {sp.images?.length > 0 && (
+                      <div className="mb-2">
+                        {sp.images.map((img, i) => (
+                          <Image
+                            key={i}
+                            src={img}
+                            alt={`Subproject ${i}`}
+                            fluid
+                            rounded
+                            className="m-1"
+                            style={{ maxWidth: "150px" }}
+                          />
+                        ))}
+                      </div>
+                    )}
                     <UploadImage
                       targetId={sp?.id}
                       uploadEndpoint={`${API_URL}/api/uploads/projects/${id}/subprojects/${sp.id}/upload`}
@@ -235,9 +223,20 @@ const ProjectDetails = () => {
               title={"+ New Subproject"}
               projectId={id}
             />
+
+            {/* ✅ View Instructions Button */}
+            <div className="mt-4">
+              <Button
+                variant="primary"
+                onClick={() => navigate(`/repair-instructions/${id}`)}
+              >
+                View Instructions
+              </Button>
+            </div>
           </div>
         </Col>
       </Row>
+
       <Button className="mt-3" onClick={() => navigate("/dashboard")}>
         Back to Dashboard
       </Button>
