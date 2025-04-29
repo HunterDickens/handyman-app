@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { auth } from "../firebase"; // Required for auth token
 import "./RepairInstructionPage.css";
 
 function RepairInstructionPage() {
-  const { projectId } = useParams(); //  useParams moved inside the component
-  const navigate = useNavigate();    //  useNavigate moved inside the component
+  const { projectId } = useParams();
+  const navigate = useNavigate();
 
   const [imageFile, setImageFile] = useState(null);
   const [imageUrl, setImageUrl] = useState("");
@@ -16,14 +17,28 @@ function RepairInstructionPage() {
 
   useEffect(() => {
     const fetchProject = async () => {
-      const res = await axios.get(`http://localhost:5000/api/projects/${projectId}`);
-      const project = res.data.project;
-      setDetectedIssues(project.description);
-      setImageUrl(project.imageUrl);
+      try {
+        const user = auth.currentUser;
+        if (!user) return;
+        const idToken = await user.getIdToken();
+
+        const res = await axios.get(`http://localhost:5000/api/projects/${projectId}`, {
+          headers: {
+            Authorization: `Bearer ${idToken}`
+          }
+        });
+
+        const project = res.data.project;
+        setDetectedIssues(project.description);
+        setImageUrl(project.imageUrl);
+      } catch (err) {
+        console.error("Failed to fetch project:", err);
+        setError("Failed to load project.");
+      }
     };
 
     fetchProject();
-  }, [projectId]); //  useEffect moved inside the component
+  }, [projectId]);
 
   const mockUploadImage = async (file) => {
     return new Promise((resolve) => {
@@ -75,10 +90,10 @@ function RepairInstructionPage() {
       "div",
       { className: "dashboard-card" },
 
-      //  Back Buttons
+      // ✅ Modified Back Button
       React.createElement("div", { className: "button-row" },
         React.createElement("button", { onClick: () => navigate("/dashboard") }, "← Back to Dashboard"),
-        React.createElement("button", { onClick: () => navigate("/projects") }, "← Back to Projects")
+        React.createElement("button", { onClick: () => navigate(`/projects/${projectId}`) }, "← Back to Project")
       ),
 
       React.createElement("h2", { className: "dashboard-title" }, "Upload Damage Image & Get Repair Instructions"),
