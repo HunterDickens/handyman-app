@@ -8,6 +8,18 @@ html, body, #root {
   font-family: 'Segoe UI', sans-serif;
   overflow-x: hidden;  /* Prevents horizontal scroll */
 }
+.instructions-output {
+  margin-top: 24px;
+  background-color: #29293a;
+  padding: 20px;
+  border-radius: 12px;
+  white-space: pre-wrap;
+  color: #ffffff;
+  max-height: 400px;           /* ← Limit height */
+  overflow-y: auto;            /* ← Add scrollbar */
+  border: 1px solid #444;
+}
+
 
 .instructions-output pre {
   white-space: pre-wrap;
